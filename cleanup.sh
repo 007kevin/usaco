@@ -14,7 +14,7 @@ if [[ $exec ]] || [[ $in ]] || [[ $out ]]; then
     read -p "Delete these files? " -n 1 -r
     if [[ $REPLY =~ ^[Yy]$ ]]
     then
-        find . -perm /+x -type f ! -name "cleanup.sh" -delete
+        find . -perm /+x -type f ! -name "cleanup.sh" -type d -delete
         find . -name "*.in" -type f -delete
         find . -name "*.out" -type f -delete
     fi
