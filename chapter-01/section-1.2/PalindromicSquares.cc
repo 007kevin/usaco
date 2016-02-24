@@ -3,6 +3,40 @@ ID: min_j
 LANG: C++
 TASK: palsquare
 Date: 23/02/2015
+Comment:
+  Clever alternatives to ispal and returnbase functions
+
+//Making use of pointer properties
+int ispal(char *s)
+{
+    char *t;
+    for(t=s+strlen(s)-1; s<t; s++, t--)
+    	if(*s != *t)
+	    return 0;
+
+    return 1;
+}
+
+//Recursive
+//put the base b representation of n into s: 0 is represented by ""
+void numbconv(char *s, int n, int b)
+{
+    int len;
+
+    if(n == 0) {
+	strcpy(s, "");
+	return;
+    }
+
+    // figure out first n-1 digits
+    numbconv(s, n/b, b);
+
+    // add last digit
+    len = strlen(s);
+    s[len] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"[n%b];
+    s[len+1] = '\0';
+}
+
 */
 #include <stdio.h>
 #include <stdlib.h>
