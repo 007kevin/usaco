@@ -3,6 +3,10 @@ ID: min_j
 LANG: C++
 TASK: crypt1
 Date: 07/03/2015
+Analysis:
+  The constrains of this problem are small enough. We could have just tried
+  all possible products of 3 digit * 2 digit numbers to see if correct digits
+  are used. That would have been a much simpler solution to solve.
 */
 #include <iostream>
 #include <vector>
