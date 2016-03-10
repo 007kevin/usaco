@@ -3,6 +3,8 @@ ID: min_j
 LANG: C++
 TASK: combo
 Date: 09/03/2015
+Comment:
+Could not get this solution to work for dial < 5. 
 */
 #include <stdio.h>
 
