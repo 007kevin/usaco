@@ -3,6 +3,8 @@ ID: min_j
 LANG: C++
 TASK: ariprog
 Date: 15/03/2015
+Comment:
+Working solutiion
 */
 #include <iostream>
 #include <fstream>
