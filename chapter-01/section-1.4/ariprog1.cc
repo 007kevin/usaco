@@ -25,21 +25,22 @@ bool compare(ans a, ans b){
 }
 
 bool isbisquare(int n){
-  if (BS[n] == 0){
-    for (int i = 0; i <= M; ++i)
-      for (int j = 0; j <= M; ++j)
-        if (pow(i,2) + pow(j,2) == n){
-          BS[n] = 1;
-          return true;
-        }
-    return false;
-  }
-  else
-    return true;
+  // if (BS[n] == 0){
+  //   for (int i = 0; i <= M; ++i)
+  //     for (int j = 0; j <= M; ++j)
+  //       if (pow(i,2) + pow(j,2) == n){
+  //         BS[n] = 1;
+  //         return true;
+  //       }
+  //   return false;
+  // }
+  // else
+  //   return true;
+  return BS[n] == 1;
 }
 
 void generate_seq(int a, int b, int n){
-  if (n == N){
+  if (n == N){ // Found valid sequence
     for (int i = 0; i < N; ++i)
       cout << seq[i] << " ";
     cout << endl;
@@ -48,22 +49,19 @@ void generate_seq(int a, int b, int n){
     ai++;
     return;
   }
+  if (a + (b*(N-n)) <= MAXBS)
+    return; // Valid sequence not possible
+  
   seq[n] = a + (n*b);
-  if (isbisquare(seq[n])){
-    generate_seq(a, b, n+1);
-  }
+  if (isbisquare(seq[n]))
+    generate_seq(a, b, n+1);  // Continue to generate sequence
   else
-    return;
+    for (int i = 1; a + (N*i) <= MAXBS; ++i)
+      generate_seq(a, i, 0);
 }
 
 void solve(){
-  int a = 0, b = 1;
-  while (a <= MAXBS){
-    b = 1;
-    while (b <= MAXBS)
-      generate_seq(a, b++, 0);
-    a++;
-  }
+  generate_seq(0, 1, 0);
   sort(answers, answers + ai, compare);
 }
 
@@ -72,6 +70,11 @@ int main(void){
   ofstream fout("ariprog.out");
   fin >> N >> M;
   MAXBS = 2*pow(M,2); // We keep printing answers until we reach the maximum bisquare
+  for (int i = 0; i <= M; ++i)
+    for (int j = 0; j <= M; ++j){
+      int idx = pow(i,2)+pow(j,2);
+      BS[idx] = 1;
+    }
   fin.close();
   solve();
   
