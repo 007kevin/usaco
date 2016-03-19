@@ -3,6 +3,9 @@ ID: min_j
 LANG: C++
 TASK: ariprog
 Date: 15/03/2015
+Comment: 
+Solution correct, but too slow to meet judgement requirements.
+Big O?
 */
 #include <iostream>
 #include <fstream>

@@ -4,7 +4,16 @@ LANG: C++
 TASK: ariprog
 Date: 15/03/2015
 Comment:
-Working solutiion
+Working solution.
+Precalculates all bisquares, then goes through
+each bisquare value to determine if a valid sequence
+can be calculated. If the recursive cal find that 
+the nth sequence is invalid, set N[0] as the current seq[n]
+and try again with a bigger sequential difference (i.e b).
+Stop when the sequence to be calculated does not exceed the 
+max bisquare.
+
+Big O ?
 */
 #include <iostream>
 #include <fstream>

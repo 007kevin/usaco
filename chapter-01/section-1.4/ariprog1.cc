@@ -3,6 +3,7 @@ ID: min_j
 LANG: C++
 TASK: ariprog
 Date: 15/03/2015
+Comment: Solution incorrect. Stack overflows from infinite recursion
 */
 #include <iostream>
 #include <fstream>
