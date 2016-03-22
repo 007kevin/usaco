@@ -3,6 +3,11 @@ ID: min_j
 LANG: C++
 TASK: numtri
 Date: 20/03/2015
+Comment: 
+Recursive solution too slow. Because we only need the
+max path sum, and not what the path is, it may be faster
+to implement just a for loop.
+Solution provided in numtri1.cc         
 */
 #include <iostream>
 #include <fstream>
@@ -13,6 +18,7 @@ int path[1000];
 int memo[1000];
 
 void solve(int lvl, int node, int csum){
+  
   if (lvl + 1 ==  R){
     path[lvl] = ntree[lvl][node];
     int sum = 0;
@@ -26,15 +32,13 @@ void solve(int lvl, int node, int csum){
   }
   path[lvl] = ntree[lvl][node];
   csum = csum + path[lvl];
-  
-  if (csum >= memo[lvl]){
+
+  if (csum  >= memo[lvl]){
     memo[lvl] = csum;
-  
-    //    if (ntree[lvl+1][node] + memo[lvl] >= memo[lvl + 1])
     solve(lvl + 1, node, csum);
-    //    if (ntree[lvl+1][node + 1] + memo[lvl] >= memo[lvl + 1])
     solve(lvl + 1, node + 1, csum);
   }
+  
 }
 
 
