@@ -30,8 +30,7 @@ bool isprime(unsigned long n){
     return false;
   if (n % 3 == 0)
     return false;
-
-  int i = 5;
+  int i = 5;p
   int w = 2;
   while (i * i <= n){
     if (n % i == 0)
