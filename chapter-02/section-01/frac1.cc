@@ -2,7 +2,7 @@
 ID: min_j
 LANG: C++
 TASK: frac1
-Date: 27/03/2015
+Date: 02/04/2015
 Analysis:
 note ~ to use unique, first sort since it removes all but the first element 
 from every consecutive group of equivalent elements
