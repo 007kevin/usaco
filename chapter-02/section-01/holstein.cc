@@ -7,6 +7,16 @@ Analysis:
 Solution correct, but dfs is too slow thus
 fails at running time. Should try implementing
 bfs.
+
+Edit: DFS was too slow because I wasn't
+adding the next scoop that is greater than the 
+previous scoop. Rather, I was only checking if the 
+current scoop wasn't already included (via feed_available).
+Since the order of scoops doesn't matter, this resulted in
+duplicate scoop combinations therefore greatly increasing
+the number of current[MAXG] to be tested. 
+
+Was on the right track, just had to change one line ...
 */
 #include <iostream>
 #include <fstream>
@@ -76,7 +86,7 @@ void solve(){
     return;
   }
   for (int i = 1; i <= G; ++i){
-    if (feed_available(i)){
+    if (i > current[scoops]){ // if (feed_available(i))
       current[++scoops] = i;
       solve();
       scoops--;
@@ -98,7 +108,6 @@ int main(){
   minscoops = 100000;
   solve();
 
-  sort(solution + 1, solution + 1 + minscoops);
   fout << minscoops << " ";
   int i; 
   for (i = 1; i < minscoops; ++i)

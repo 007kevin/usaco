@@ -9,7 +9,7 @@ Breath first search
 #include <iostream>
 #include <fstream>
 #include <algorithm>
-#include <queue>
+#include <list>
 #include <vector>
 using namespace std;
 
@@ -42,23 +42,52 @@ bool feed_available(vector<int>& a, int b){
   return false;
 }
 
+bool exist(list<vector<int> >& nodes, vector<int>& node){
+  list<vector<int> >::const_iterator i;
+  for (i = nodes.begin(); i != nodes.end(); ++i){
+    if (i->size() != node.size())
+      continue;
+    bool same = true;
+    for (int j = 0; j < i->size(); ++j){
+      if ((*i)[j] != node[j]){
+        same = false;
+        break;
+      }
+    }
+    if (same)
+      return true;
+  }
+  return false;
+}
+
 void solve(){
-  queue<vector<int> > nodes;
+  list<vector<int> > nodes;
   for (int i = 0; i < G; ++i){
     vector<int> node;
     node.push_back(i);
-    nodes.push(node);
+    nodes.push_back(node);
   }
+  int processed_lvl = 1;
   while (!nodes.empty()){
+
+    /* DEBUG */
+    list<vector<int> >::const_iterator test;
+    cout << "************* s:" << solution.size() << endl;
+    for (test = nodes.begin(); test != nodes.end(); ++test){
+      cout << test->size() << " ";
+      for (int i = 0; i < test->size(); ++i)
+        cout << (*test)[i] + 1 << " ";
+      cout << endl;
+    }
+    /* DEBUG */
+
     vector<int> node = nodes.front();
-    nodes.pop();
-    
-    // cout << node.size() << " ";
-    // for (int i = 0; i < node.size(); ++i)
-    //   cout << node[i] + 1 << " ";
-    // cout << endl;
-    
-    if (requirements_met(node)){
+    nodes.pop_front();
+
+    if (node.size() > processed_lvl)
+      processed_lvl = node.size();
+
+     if (requirements_met(node)){
       if (node.size() < solution.size() || solution.size() == 0){
         solution = node;
       }
@@ -74,17 +103,20 @@ void solve(){
       }
     }
     else {
-      if (solution.size() == 0 || node.size() < solution.size())
-      for (int i = 0; i < G; ++i){
-        if (feed_available(node, i)){
-          node.push_back(i);
-          nodes.push(node);
-          node.pop_back();
+      if (solution.size() == 0 || (node.size() == processed_lvl && node.size() < solution.size()))
+        for (int i = 0; i < G; ++i){
+          if (feed_available(node, i)){
+            vector<int> newnode = node;
+            newnode.push_back(i);
+            sort(newnode.begin(), newnode.end());
+            if (!exist(nodes, newnode))
+              nodes.push_back(newnode);
+          }
         }
-      }
     }
   }
 }
+
 
 int main(){
   ifstream fin("holstein.in");
@@ -100,7 +132,6 @@ int main(){
 
   solve();
 
-  sort(solution.begin(), solution.end());
   fout << solution.size() << " ";
   int i;
   for (i = 0; i < solution.size() - 1; ++i)
