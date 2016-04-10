@@ -95,7 +95,6 @@ int main(){
   fscanf(fin, "%d",& N);
   fclose(fin);
 
-
   char buf[100];
   for (int i = 1; i <= N; ++i){
     roman(buf, i);
