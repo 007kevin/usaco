@@ -4,28 +4,32 @@ LANG: C++
 TASK: subset
 Date: 10/04/2015
 Analysis:
-If sum of 1..N is odd, then there are no partitions of equal sum
+- If sum of 1..N is odd, then there are no partitions of equal sum
+- By looking for partitions where N is not included, we avoid
+  double counting partitions (i.e the for loop in solve() goes 1..N-1)
 */
 #include <iostream>
 #include <fstream>
 using namespace std;
 #define MAXN 39
-#define UL unsigned long
 int N;
-int ans[MAXN+1];
-int sums[MAXN+1];
+int SUM;
+int nsets;
+
 /*
   last - keep track of last element included in the set
   csum - current sum of the set
 */
-void solve(int n, int last, int csum, int sum, int &nsets){
-  if (csum == sum-csum){
+void solve(int last, int csum){
+  if (csum == SUM-csum){
     nsets++;
     return;
   }
-  for (int i = 1; i <= n; ++i){
-    if (i > last && csum + i <= sum/2){
-      solve(n, i, csum + i, sum, nsets);
+  for (int i = 1; i < N; ++i){
+    if (i > last && csum + i <= SUM/2){
+      cout << i << " ";
+      solve(i, csum + i);
+      cout << endl;
     }
   }
 }
@@ -35,20 +39,11 @@ int main(){
   ofstream fout("subset.out");
   fin >> N;
   fin.close();
+  for (int i = 1; i <= N; ++i)
+    SUM+=i;
+  solve(0,0);
 
-  int sum = 0;
-  for (int i = 1; i <= N; ++i){
-    sum+=i;
-    int nsets = 0;
-    sums[i] = sum;
-    solve(i-1,0,0,sum,nsets);
-    ans[i] = nsets;
-  }
-
-  //DEBUG
-  for (int i = 1; i <= N; ++i){
-    cout << i << ": " << ans[i] << " sum: " << sums[i] << endl;
-  }
+  cout << nsets << endl;
 
   fout.close();
   return 0;
