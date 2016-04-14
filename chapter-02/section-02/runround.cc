@@ -26,44 +26,49 @@ Anaylsis:
 #include <fstream>
 #include <cstring>
 #include <cstdlib>
+#include <climits>
 using namespace std;
+#define MAXD 11 // max number of digit
 unsigned long M;
 
-bool runround(unsigned long n){
-  char num[100];
-  sprintf(num, "%lu", n);
-  int length = strlen(num);
-  int len = length;
-  int i = 0;
-  int sum = 0;
-  while (len){
-    int nexti = (i+(num[i]-'0'))%length;
-    sum += nexti;
-    i = nexti;
-    len--;
-  }
-  return sum == length*(length-1)/2;
+struct node {
+  int d; //digit
+  int v; //visited
+};
+
+int setup(node *nodes, unsigned long n){
+  if (n == 0)
+    return 0;
+  int i = setup(nodes, n/10);
+  nodes[i].d = n%10;
+  nodes[i].v = 0;
+  return i+1;
 }
 
-unsigned long getmap(unsigned long n){
-  char num[100];
-  char imap[100];
-  sprintf(num, "%lu", n);
-  int i,length = strlen(num);
+unsigned long getmap(int *imap, unsigned long n){
+  node nodes[MAXD];
+  int length = setup(nodes, n);
+  int i;
   for (i = 0; i < length; ++i)
-    imap[i] = ((i+num[i]-'0')%length)+'0';
-  imap[i] = '\0';
-  cout << "NUM: " <<  num << endl;  
+    imap[i] = ((i+nodes[i].d)%length);
+  cout << "NUM: " <<  n << endl;  
   cout << "MAP FROM: ";
   for (int i = 0; i < length; ++i)
     cout << i;
   cout << endl;
-  cout << "MAP TO:   " <<  imap << endl << endl;
-  return strtoul(imap, NULL, 0);
+  
+  cout << "MAP TO:   ";
+  for (int i = 0; i < length; ++i)
+    cout << imap[i];
+  cout << endl;
+
+  length;
 }
 
-void solve(){
-  
+bool runround(unsigned long n){
+  int imap[MAXD];
+  int length = getmap(imap, n);
+  return 1;
 }
 
 int main(){
@@ -71,11 +76,12 @@ int main(){
   ofstream fout("runround.out");
   fin>>M;
   fin.close();
-  M++;
-  while (!runround(M))
-    M++;
+  // M++;
+  // while (!runround(M))
+  //   M++;
+  // cout << M << endl;
+  runround(81362);
 
-  fout << M << endl;
 
   fout.close();
   return 0;
