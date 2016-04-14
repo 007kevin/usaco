@@ -17,9 +17,9 @@ Anaylsis:
   we need to get the a cyclic permutation
   closest to number M
 
-  Will we ever need to increase the number of digits to get to the
-  next rangeround number? => no because 9, 99 , 99...9 are all rangeround
-  numbers
+  Edit - Solved the problem with the simple approach of checking
+         every next value to be a rangeround number. As always said:
+         "Always try the simplest solution first"
 
 */
 #include <iostream>
@@ -45,30 +45,51 @@ int setup(node *nodes, unsigned long n){
   return i+1;
 }
 
-unsigned long getmap(int *imap, unsigned long n){
-  node nodes[MAXD];
+int getmap(node *nodes, int *imap, unsigned long n){
   int length = setup(nodes, n);
   int i;
   for (i = 0; i < length; ++i)
     imap[i] = ((i+nodes[i].d)%length);
-  cout << "NUM: " <<  n << endl;  
-  cout << "MAP FROM: ";
-  for (int i = 0; i < length; ++i)
-    cout << i;
-  cout << endl;
   
-  cout << "MAP TO:   ";
-  for (int i = 0; i < length; ++i)
-    cout << imap[i];
-  cout << endl;
+  // cout << "NUM: " <<  n << endl;  
+  // cout << "MAP FROM: ";
+  // for (int i = 0; i < length; ++i)
+  //   cout << i;
+  // cout << endl;
+  
+  // cout << "MAP TO:   ";
+  // for (int i = 0; i < length; ++i)
+  //   cout << imap[i];
+  // cout << endl;
 
-  length;
+  return length;
 }
 
 bool runround(unsigned long n){
+  node nodes[MAXD];
   int imap[MAXD];
-  int length = getmap(imap, n);
-  return 1;
+  int length = getmap(nodes,imap,n);
+  int sum = 0;
+  for (int i = 0; i < length; ++i){
+    if (i == imap[i])
+      return false;
+    for (int j = 0; j < length; ++j){
+      if (i!=j&&imap[i]==imap[j])
+        return false;
+      if (i!=j&&nodes[i].d==nodes[j].d)
+        return false;
+    }
+  }
+  int hops = length, i = 0;
+  while (hops){
+    nodes[i].v++;
+    i = (i+nodes[i].d)%length;
+    hops--;
+  }
+  for (int i = 0; i < length; ++i)
+    if (nodes[i].v != 1)
+      return false;
+  return true;
 }
 
 int main(){
@@ -76,12 +97,11 @@ int main(){
   ofstream fout("runround.out");
   fin>>M;
   fin.close();
-  // M++;
-  // while (!runround(M))
-  //   M++;
-  // cout << M << endl;
-  runround(81362);
-
+  
+  M++;
+  while (!runround(M))
+    M++;
+  fout << M << endl;
 
   fout.close();
   return 0;
