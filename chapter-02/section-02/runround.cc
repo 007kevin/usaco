@@ -21,6 +21,9 @@ Anaylsis:
          every next value to be a rangeround number. As always said:
          "Always try the simplest solution first"
 
+  "The trick to this problem is noticing that since runaround numbers 
+   must have unique digits, they must be at most 9 digits long"
+
 */
 #include <iostream>
 #include <fstream>
