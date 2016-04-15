@@ -2,8 +2,8 @@
 ID: min_j
 LANG: C++
 TASK: lamps
-Date: 15/04/20ppppp15
-Anaylsis:nnnnn
+Date: 15/04/2015
+Anaylsis:
   Order of the buttons pressed does not matter. Also, pressing
   a button twice is the same as no presses at all. Therefore
   there can be at most 2^4 = 16 combinations of button presses.
@@ -52,6 +52,7 @@ bool compare(char *a, char *b){
     if (a[i] == '1' && b[i] == '0')
       return false;
   }
+  return false;
 }
 
 void solve(int c){
@@ -90,27 +91,19 @@ int main(){
     F[l-1] = '0';
     fin>>l;
   }
-  // cout << L << endl;
-  // toggle();
-  // cout << "toggle " << L << endl;
-  // toggle();
-  // odd();
-  // cout << "odd    " << L << endl;
-  // odd();
-  // even();
-  // cout << "even   " << L << endl;
-  // even();
-  // k();
-  // cout << "k      " << L << endl;  
-
-  solve(C);
+  solve(C < 4 ? C : 4);
   sort(solution, solution + si, compare);
-  unique(solution, solution + si);
-  for (int i = 0; i < si; ++i)
-    fout << solution[i] << endl;
+  if (si > 0){
+    char *last = solution[0];
+    fout << last << endl;
+    for (int i = 1; i < si; ++i)
+      if (strcmp(last, solution[i]) != 0){
+        fout << solution[i] << endl;
+        last = solution[i];
+      }
+  }
   if (si == 0)
     fout << "IMPOSSIBLE" << endl;
-
 
   return 0;
 }
