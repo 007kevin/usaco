@@ -4,8 +4,10 @@ LANG: C++
 TASK: prefix
 Date: 15/04/2015
 Anaylsis:
-  This solution is O(N*L) where N is the number of constituants
-  in the seqence. Too slow. 
+  Dynamic programming ftw.
+  We build up a 1 dimensional dp array since
+  we don't need to know what the longest primitive
+  constituant is composed of. Only the length.
 */
 #include <iostream>
 #include <fstream>
@@ -15,23 +17,9 @@ using namespace std;
 #define MAXP 11
 #define MAXS 200001
 string prim[MAXL];
-string seq;
+string seq = " ";
 int L, K;
-
-void solve(int cur){
-  if (cur > K)
-    K = cur;
-  for (int i = 0; i < L; ++i){
-    int j;
-    for (j = 0; j < prim[i].size(); ++j)
-      if (cur+j > seq.size() || prim[i][j] != seq[cur+j]){
-        j = 0;
-        break;
-      }
-    if (j)
-      solve(cur+j);
-  }
-}
+int dp[MAXS];
 
 int main(){
   ifstream fin("prefix.in");
@@ -41,16 +29,24 @@ int main(){
     if (s == ".")
       break;
     else 
-      prim[L++] = s;
+      prim[++L] = s;
   while (fin >> s)
     seq+=s;
+  prim[0] = "";
 
-  solve(0);
+  dp[0] = 1;
+  for (int i = 0; i < seq.size(); ++i)
+    if (dp[i])
+      for (int j = 1; j <= L; ++j)
+        if (seq.compare(i+1, prim[j].size(), prim[j]) == 0)
+          dp[i+prim[j].size()] = 1;
+  
+  int sol = 0;
+  for (sol = seq.size()-1; sol > 0; --sol)
+    if (dp[sol]){
+      break;
+    }
+  fout << sol << endl;
 
-  fout << K << endl;
-  // for (int i = 0; i < L; ++i)
-  //   cout << prim[i] << " ";
-  // cout << endl;
-  // cout << seq << endl;
   return 0;
 }
