@@ -14,28 +14,31 @@ Anaylsis:
 #include <fstream>
 #include <cmath>
 using namespace std;
-#define MAXN 200 // 3 <= N < 200
-#define MAXK 100 // 1 < K < 100
+#define MAXN 201 // 3 <= N < 200
+#define MAXK 101 // 1 < K < 100
 #define MODULO 9901
 int N,K;
-unsigned long long table[MAXN][MAXK];
+long long dp[MAXN][MAXK];
 
 int main(){
   ifstream fin("nocows.in");
   ofstream fout("nocows.out");
   fin>>N>>K;
-  table[1][1] = 1;
-  for (int n = 1; n <= N; ++n)
-    for (int k = 1; k <= K; ++k){
-      
+
+  for (int k = 1; k <= K; ++k){
+    dp[1][k] = 1; // loop on heights
+    for (int n = 2; n <= N; ++n){
+      dp[n][k] = 0; // loop on nodes
+      for (int p = 1; p <= n-2; ++p){ // loop on previous nodes
+        dp[n][k] += dp[p][k-1] * dp[n-1-p][k-1];
+        dp[n][k] %= MODULO;
       }
     }
+  }
 
-  fout << table[N][K]%MODULO << endl;
-  
   for (int i = 1; i <= N; ++i){
     for (int j = 1; j <= K; ++j)
-      cout << table[i][j] << " ";
+      cout << dp[i][j] << " ";
     cout << endl;
   }
   
