@@ -8,6 +8,7 @@ Anaylsis:
   N must be odd (i.e 1,3,5,7)
 
   The recurrence relation are the subtrees!
+
 */
 #include <iostream>
 #include <fstream>
