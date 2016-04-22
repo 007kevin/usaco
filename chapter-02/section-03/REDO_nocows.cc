@@ -9,6 +9,13 @@ Anaylsis:
 
   The recurrence relation are the subtrees!
 
+  Not sure for this solution why we are
+  dp[N][K]-dp[N][K-1] before output??
+  
+  Solution file prefixed with 'REDO' so that
+  I come back to this later and understand
+
+
 */
 #include <iostream>
 #include <fstream>
@@ -18,7 +25,7 @@ using namespace std;
 #define MAXK 101 // 1 < K < 100
 #define MODULO 9901
 int N,K;
-long long dp[MAXN][MAXK];
+unsigned long long dp[MAXN][MAXK];
 
 int main(){
   ifstream fin("nocows.in");
@@ -34,13 +41,17 @@ int main(){
         dp[n][k] %= MODULO;
       }
     }
+    
+    // for (int i = 1; i <= N; ++i){
+    //   for (int j = 1; j <= K; ++j)
+    //     cout << dp[i][j] << " ";
+    //   cout << endl;
+    // }
+    // cout << "-----------" << endl;
+
   }
 
-  for (int i = 1; i <= N; ++i){
-    for (int j = 1; j <= K; ++j)
-      cout << dp[i][j] << " ";
-    cout << endl;
-  }
+  fout << ((dp[N][K]+MODULO)-dp[N][K-1])%MODULO << endl;
   
   return 0;
 }
