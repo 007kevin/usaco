@@ -4,6 +4,13 @@ LANG: C++
 TASK: money
 Date: 22/04/2015
 Anaylsis:
+  We want to use dp to get the number of combination
+  of coins to get N. Since order of coins does not matter, we build
+  up the dp table while ensuring not to double count coin 
+  combinatio (i.e 1+2 = 3 = 2+1) . This is achieved by keeping the
+  combinations of coins in sorted order ( j <= c ).
+ 
+  For the solution, we sum up the values dp[N][].
 
 */
 #include <iostream>
@@ -12,15 +19,15 @@ Anaylsis:
 #define MAXV 26
 #define MAXN 10001
 using namespace std;
-int V, N;
-int dp[MAXN][MAXV], coin[MAXV];
+int V, N, coin[MAXV];
+long long dp[MAXN][MAXV];
 
 void solve(){
   for (int i = 0; i < N; ++i)
     for (int j = 0; j <= V; ++j)
       if (dp[i][j]){
         for (int c = 1; c <= V; ++c){
-          if (j <= c)
+          if (j <= c && i+coin[c] <= N)
             dp[i+coin[c]][c] += dp[i][j];
         }
       }
@@ -34,13 +41,7 @@ int main(){
     fin >> coin[i];
   dp[0][0] = 1;
   solve();
-  // for (int i = 0; i <= N; ++i){
-  //   for (int j = 0; j <= V; ++j)
-  //     cout << dp[i][j] << " ";
-  //   cout << endl;
-  // }
-
-  int sum = 0;
+  long long sum = 0;
   for (int i = 1; i <= V; ++i)
     sum+=dp[N][i];
   fout << sum << endl;
