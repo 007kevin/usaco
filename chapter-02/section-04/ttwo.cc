@@ -8,6 +8,9 @@
   directions they can face, leaving us with 400*400 = 160000 different
   configurations for FJ and COWS. If they are to meet, they will meet
   within the 160000 configurations else is an infinite loop. 
+
+  tip - calculate where the limits of the problems are if the 
+        constrains are given
 */
 #include <stdio.h>
 
