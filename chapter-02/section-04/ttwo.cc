@@ -4,7 +4,10 @@
   TASK: ttwo
   Date: 25/04/2015
   Anaylsis:
-
+  There are only 100 places where the cows can meet, and only 4
+  directions they can face, leaving us with 400*400 = 160000 different
+  configurations for FJ and COWS. If they are to meet, they will meet
+  within the 160000 configurations else is an infinite loop. 
 */
 #include <stdio.h>
 
@@ -70,7 +73,10 @@ int tick(){
         FJ.s[0] == FJ.c[0] &&
         FJ.s[1] == FJ.c[1] &&
         COWS.s[0] == COWS.c[0] &&
-        COWS.s[1] == COWS.c[1])
+        COWS.s[1] == COWS.c[1] &&
+        FJ.d == 'n' && COWS.d == 'n')
+      return 0;
+    if (count == 160000)
       return 0;
     if (FJ.c[0] == COWS.c[0] &&
         FJ.c[1] == COWS.c[1])
