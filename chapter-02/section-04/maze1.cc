@@ -4,6 +4,8 @@ LANG: C++
 TASK: maze1
 Date: 26/04/2015
 Anaylsis:
+  Although this solution is also correct, we could
+  have solved this problem with the flood fill algorithm
 
 */
 #include <stdio.h>
@@ -11,12 +13,13 @@ Anaylsis:
 #include <assert.h>
 #include <algorithm>
 
+//#define DEBUG
 #define MAXW 38
 #define MAXH 100
 #define infinity INT_MAX
-#define m(x) (x)*2+1
+#define m(x) ((x)*2+1)
 int W,H;
-char maze[m(MAXH)][m(MAXW)+1];
+char maze[m(MAXH)+5][m(MAXW)+5];
 
 typedef struct obj {
   int x,y,id;
@@ -117,12 +120,15 @@ int main(){
   while(fgetc(fin) != '\n'); // Because scanf scans until it finds a whitespace character,
                              // the whitespace is left in the buffer. Thus we must read
                              // from input until that whitespace character is read
-  for (int i = 0; i < 2*H+1; ++i)
-    fgets(&maze[i][0], MAXW, fin);
+  for (int i = 0; i < m(H); ++i)
+    fgets(&maze[i][0], m(W)+5, fin);
 
   // Find exits
   int exit[2];
+  exit[0] = exit[1] = -1;
   find(exit);
+  if (exit[1] == -1)
+    exit[1] = exit[0];
 
   // Setup initial state of tables
   for (int i = 0; i < H*W; ++i){
@@ -136,7 +142,7 @@ int main(){
       v.dist = 0;
       table1[i] = v;
     }
-    else if (exit[1] == i){
+    if (exit[1] == i){
       table1[i] = v;
       v.dist = 0;
       table2[i] = v;
@@ -149,15 +155,15 @@ int main(){
 
   dijkstra_SPA(table1);
   dijkstra_SPA(table2);
+  
   int sol[H*W];
   for (int i = 0; i < H*W; ++i)
-    sol[i] = table1[i].dist < table2[i].dist ? table1[i].dist : table2[i].dist;
+      sol[i] = table1[i].dist < table2[i].dist ? table1[i].dist : table2[i].dist;
+
   std::sort(sol,sol+H*W);
-  // we add one to solution for the last step of moving out of the maze  
-  fprintf(fout,"%d\n",sol[H*W-1]+1);
-  
+
 #ifdef DEBUG
-  for (int i = 0; i < 2*H+1; ++i)
+  for (int i = 0; i < m(H); ++i)
     printf("%s", &maze[i][0]);
   printf("exits %d %d\n",exit[0],exit[1]);
   printf("---- table 1 ----\n");
@@ -166,9 +172,12 @@ int main(){
     printf("%d\t%d\t%d\t%d\n",table1[i].id,table1[i].visited,table1[i].dist,table1[i].parent);
   printf("\n---- table 2 ----\n");
   printf("node\tvisited\tdist2source\tparent\n");
-  for (int i = 0; i < H*W; ++i)
-    printf("%d\t%d\t%d\t%d\n",table2[i].id,table2[i].visited,table2[i].dist,table2[i].parent);
+  for (int i = 0; i < H*W; ++i)  
+    printf("%d\t%d\t%d\t%d\n",table1[i].id,table1[i].visited,table1[i].dist,table1[i].parent);
 #endif
+
+  // we add one to solution for the last step of moving out of the maze  
+  fprintf(fout,"%d\n",sol[H*W-1]+1);
   
   fclose(fin);
   fclose(fout);
