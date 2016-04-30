@@ -9,8 +9,8 @@ Anaylsis:
 #include <stdio.h>
 #include <limits.h>
 #include <assert.h>
+#include <algorithm>
 
-#define DEBUG
 #define MAXW 38
 #define MAXH 100
 #define infinity INT_MAX
@@ -19,7 +19,7 @@ int W,H;
 char maze[m(MAXH)][m(MAXW)+1];
 
 typedef struct obj {
-  int x,y;
+  int x,y,id;
   int visited,dist,parent;
 } vertex;
 
@@ -37,11 +37,18 @@ int adjacent(vertex v1, vertex v2){
   return res;
 }
 
+vertex convert(int i){
+  vertex v;
+  v.x = i/W;
+  v.y = i - ((i/W)*W);
+  return v;
+}
+
 void find(int *exit){
   int e = 0;
   vertex v;
   for (int i = 0; i < H*W; ++i){
-    v.x = i/W; v.y = i - ((i/W)*W);
+    vertex v = convert(i);
     if (v.x == 0   && maze[m(v.x)-1][m(v.y)] == ' ') exit[e++] = i;
     if (v.x == H-1 && maze[m(v.x)+1][m(v.y)] == ' ') exit[e++] = i;
     if (v.y == 0   && maze[m(v.x)][m(v.y)-1] == ' ') exit[e++] = i;
@@ -56,14 +63,40 @@ int add(int a, int b){
     return a+b;
 }
 
-void dijkstra_SPA(int source, vertex *table){
-  int visited = 0;
-  while (visited < H*W){
-    int dist = infinity;
+void dijkstra_SPA(vertex *table){
+  // Keep loops until all verticies have been visited
+  while (true){
+    vertex *v = NULL;
     for (int i = 0; i < H*W; ++i) // find unvisited vertex with min. dist to source
-      if (table[i].visited == 0 && table[i].dist < dist){
-        dist = table[i];
-    
+      if (table[i].visited == 0 && (v == NULL || table[i].dist < v->dist)){
+        v = table+i;
+      }
+    if (v == NULL) break;
+    v->visited = 1;
+    // Find adjacent vertices of the visiting vertex.
+    // We know a given square can be at most adjacent to
+    // four other squares
+    if (v->id+1<H*W && adjacent(*v,table[v->id+1])){
+      if (add(v->dist,1) < table[v->id+1].dist){
+        table[v->id+1].dist = add(v->dist,1);
+        table[v->id+1].parent = v->id;
+      }
+    }
+    if (v->id-1>=0 && adjacent(*v,table[v->id-1]))
+      if (add(v->dist,1) < table[v->id-1].dist){
+        table[v->id-1].dist = add(v->dist,1);
+        table[v->id-1].parent = v->id;
+      }
+    if (v->id-W>=0 && adjacent(*v,table[v->id-W]))
+      if (add(v->dist,1) < table[v->id-W].dist){
+        table[v->id-W].dist = add(v->dist,1);
+        table[v->id-W].parent = v->id;
+      }
+    if (v->id+W<H*W && adjacent(*v, table[v->id+W]))
+      if (add(v->dist,1) < table[v->id+W].dist){
+        table[v->id+W].dist = add(v->dist,1);
+        table[v->id+W].parent = v->id;
+      }
   }
 }
 
@@ -93,8 +126,8 @@ int main(){
 
   // Setup initial state of tables
   for (int i = 0; i < H*W; ++i){
-    vertex v;
-    v.x = i/W; v.y = i-((i/W)*W);
+    vertex v = convert(i);
+    v.id = i;
     v.visited = 0;    
     v.dist = infinity;
     v.parent = -1;
@@ -114,7 +147,14 @@ int main(){
     }
   }
 
-  dijkstra_SPA(exit[0],table1);
+  dijkstra_SPA(table1);
+  dijkstra_SPA(table2);
+  int sol[H*W];
+  for (int i = 0; i < H*W; ++i)
+    sol[i] = table1[i].dist < table2[i].dist ? table1[i].dist : table2[i].dist;
+  std::sort(sol,sol+H*W);
+  // we add one to solution for the last step of moving out of the maze  
+  fprintf(fout,"%d\n",sol[H*W-1]+1);
   
 #ifdef DEBUG
   for (int i = 0; i < 2*H+1; ++i)
@@ -123,11 +163,11 @@ int main(){
   printf("---- table 1 ----\n");
   printf("node\tvisited\tdist2source\tparent\n");
   for (int i = 0; i < H*W; ++i)
-    printf("%d\t%d\t%d\t%d\n",i,table1[i].visited,table1[i].dist,table1[i].parent);
+    printf("%d\t%d\t%d\t%d\n",table1[i].id,table1[i].visited,table1[i].dist,table1[i].parent);
   printf("\n---- table 2 ----\n");
   printf("node\tvisited\tdist2source\tparent\n");
   for (int i = 0; i < H*W; ++i)
-    printf("%d\t%d\t%d\t%d\n",i,table2[i].visited,table2[i].dist,table2[i].parent);
+    printf("%d\t%d\t%d\t%d\n",table2[i].id,table2[i].visited,table2[i].dist,table2[i].parent);
 #endif
   
   fclose(fin);
