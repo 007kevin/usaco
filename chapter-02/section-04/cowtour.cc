@@ -12,7 +12,7 @@ Anaylsis:
 #include <stdio.h>
 #include <math.h>
 #include <float.h>
-#define DEBUG
+//#define DEBUG
 #define MAXP 150
 #define inf DBL_MAX
 
@@ -79,10 +79,28 @@ int main(){
       mapc(i,2);
       break;
     }
+  // find the shortest distance between pastures
+  int a,b;
+  double min_d = inf;
+  for (int i = 0; i < P; ++i)
+    for (int j = 0; j < P; ++j){
+      if (i != j && pasture[i].c != pasture[j].c &&
+          dist(pasture[i],pasture[j]) < min_d){
+        a = i; b = j; min_d = dist(pasture[i],pasture[j]);
+      }
+    }
+  matrix[a][b] = min_d;
 
   floydwarshall();
 
-#ifdef DEBUG  
+  double max = 0;
+  for (int i = 0; i < P; ++i)
+    for (int j = 0; j < P; ++j)
+      if (i!=j && matrix[i][j] != inf && matrix[i][j] > max)
+        max = matrix[i][j];
+  fprintf(fout,"%6.6f\n",max);
+
+#ifdef DEBUG
   for (int i = 0; i < P; ++i)
     printf("%d ", pasture[i].c);
   printf("\n");
