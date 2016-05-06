@@ -68,14 +68,10 @@ int main(){
   char buf[100000];
   dec(buf,N,D);
   int counter = 0;
-  for (int i = 0; i < strlen(buf); ++i){
-    if (counter++ == 76){
-      fprintf(fout,"\n");
-      counter = 1;
-    }
-    fprintf(fout,"%c",buf[i]);
+  for (int i = 0; i < strlen(buf); i+=76){
+    fprintf(fout,"%.76s\n",buf + i);
+    
   }
-  fprintf(fout, "\n");
   fclose(fout);
   return 0;
 }
