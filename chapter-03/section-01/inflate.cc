@@ -10,37 +10,44 @@ Anaylsis:
 #include <iostream>
 #include <fstream>
 using namespace std;
-#define DEBUG
-#define MAX 10001
+//#define DEBUG
+#define MAX 20001
 
 int M,N;
 struct cate{
-  int m,p;
+  int p,m;
 };
 cate pc[MAX];
-int dp[MAX][MAX];
+int dp[MAX];
 int main(){
   ifstream fin("inflate.in");
   ofstream fout("inflate.out");
   fin>>M>>N;
+  int min,point,max=0;
   for (int i = 0; i < N; ++i){
-    fin>>pc[i].p;
-    fin>>pc[i].m;
+    fin>>point;
+    fin>>min;
+    dp[min] = point;
+    pc[i].p = point;
+    pc[i].m = min;
   }
-  for (int m = 0; m < M; ++m){
-    for (int p = 0; p < N; ++p){
-      dp[pc[p].m] += pc[p].p;
+  for (int m = 0; m <= M; ++m){
+    if (dp[m]){
+      max = dp[m] > max ? dp[m] : max;
+      for (int p = 0; p < N; ++p){
+        if (dp[m+pc[p].m] < dp[m] + pc[p].p){
+          dp[m+pc[p].m] = dp[m] + pc[p].p ;
+        }
+      }
     }
   }
+  fout<<max<<endl;
 
 #ifdef DEBUG
-  for (int i = 0; i < M; ++i){
-    for (int j = 0; j < N; ++j)
-      cout<<dp[i][j]<<" ";
-    cout<<endl;
+  for (int i = 0; i <= M; ++i){
+    cout<<i<<": "<<dp[i]<<endl;
   }
 #endif
-    
     
   return 0;
 }
