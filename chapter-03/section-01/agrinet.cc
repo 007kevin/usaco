@@ -2,7 +2,7 @@
 ID: min_j
 LANG: C++
 TASK: agrinet
-Date: 03/06/2015
+Date: 06/05/2015
 Anaylsis:
   We use prim's algorithm to go through
   each farm and adding the minimum distance 
