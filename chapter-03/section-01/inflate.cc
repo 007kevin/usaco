@@ -10,21 +10,36 @@ Anaylsis:
 #include <iostream>
 #include <fstream>
 using namespace std;
+#define DEBUG
 #define MAX 10001
 
 int M,N;
-int pc[MAX];
+struct cate{
+  int m,p;
+};
+cate pc[MAX];
 int dp[MAX][MAX];
 int main(){
   ifstream fin("inflate.in");
   ofstream fout("inflate.out");
   fin>>M>>N;
-  int point;
   for (int i = 0; i < N; ++i){
-    fin>>point;
-    fin>>pc[point]
+    fin>>pc[i].p;
+    fin>>pc[i].m;
   }
-  
+  for (int m = 0; m < M; ++m){
+    for (int p = 0; p < N; ++p){
+      dp[pc[p].m] += pc[p].p;
+    }
+  }
+
+#ifdef DEBUG
+  for (int i = 0; i < M; ++i){
+    for (int j = 0; j < N; ++j)
+      cout<<dp[i][j]<<" ";
+    cout<<endl;
+  }
+#endif
     
     
   return 0;
