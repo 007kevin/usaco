@@ -22,9 +22,12 @@ The sorting of priority queue may be what is causing the problem.
 We could eliminate sorted insertion by somehow creating
 S in sequential order.
 
+Solution Correct:
+  By adding the break statement to the dup loop and
+  changing from iostream to stdio,  I was able to 
+  reduce runtime just enough to pass.
 */
-#include <iostream>
-#include <fstream>
+#include <stdio.h>
 #include <queue>
 using namespace std;
 #define MAXK 100
@@ -36,32 +39,34 @@ priority_queue<long long,
                greater<long long> > S;
 
 int main(){
-  ifstream fin("humble.in.fail");
-  ofstream fout("humble.out");
-  fin>>K>>N;
+  FILE *fin = fopen("humble.in", "r");
+  FILE *fout = fopen("humble.out", "w");
+  fscanf(fin,"%d %d",&K,&N);
   for (int i = 0; i < K; ++i){
-    fin>>subS[i];
+    fscanf(fin,"%d",subS+i);
   }
+  fclose(fin);
   S.push(1); // Set 'base case'
   while (true){
     long long number = S.top();
     S.pop();
     if (number != 1)
       if (++counter == N){
-        fout << number << endl;
+        fprintf(fout,"%lld\n",number);
         break;
       }
     for (int i = 0; i < K; ++i){
       bool dup = false;          
       for (int j = 0; j < i; ++j) 
-        if (number%subS[j] == 0)
+        if (number%subS[j] == 0){
           dup = true;
+          break;
+        }
       if (dup == false)
         S.push(number*subS[i]);
-
+      
     }
   }
-
-  fout.close();
+  fclose(fout);
   return 0;
 }
