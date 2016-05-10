@@ -23,7 +23,6 @@ struct freq {
 };
 vector<freq> solvec;
 
-
 int pow(int b,int e){
   int res = 1;
   while (e--)
@@ -40,8 +39,14 @@ int tonum(char *s,int n){
 }
 
 bool cmp(const freq &a, const freq &b){
-  if (a.n == b.n)
-    return tonum(a.s,strlen(a.s))  < tonum(a.s,strlen(a.s));
+  if (a.n == b.n){
+    int alen = strlen(a.s);
+    int blen = strlen(b.s);
+    if (alen == blen)
+      return tonum(a.s,alen)  < tonum(a.s,blen);
+    else
+      return alen < blen;
+  }
   return a.n > b.n;
 }
 
@@ -61,7 +66,7 @@ int conv(char *buf, int n, int bitlen){
 void solve(){
   for (int i = 0; i < I; ++i){
     for (int j = A; j <= B; ++j)
-      if (i+j < I)
+      if (i+j <= I)
         sol[j][tonum(seq+i,j)]++;
   }
 }
@@ -88,7 +93,18 @@ int main(){
     }
   sort(solvec.begin(),solvec.end(),cmp);
   vector<freq>::iterator vi;
-  for (vi = solvec.begin(); vi != solvec.end(); ++vi)
-    printf("%s %d\n",vi->s, vi->n);
+  int cur = solvec.begin()->n;
+  int count = 1;
+  fprintf(fout,"%d\n", cur);
+  for (vi = solvec.begin(); vi != solvec.end(); ++vi){
+    if (vi->n != cur){
+      if (count++ == N) break;
+      fprintf(fout,"\n%d\n%s ",vi->n,vi->s);
+      cur = vi->n;
+    }
+    else{
+      fprintf(fout,"%s ",vi->s);
+    }
+  }
 
 }
