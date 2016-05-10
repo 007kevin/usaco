@@ -1,10 +1,11 @@
 /*
-ID: min_jn
+ID: min_j
 LANG: C++
 TASK: contact
 Date: 09/05/2015
 Anaylsis:
-
+ The formatting of the solution was harder 
+ than the actual problem itself :/
 */
 #include <cstdio>
 #include <cstring>
@@ -43,7 +44,7 @@ bool cmp(const freq &a, const freq &b){
     int alen = strlen(a.s);
     int blen = strlen(b.s);
     if (alen == blen)
-      return tonum(a.s,alen)  < tonum(a.s,blen);
+      return tonum(a.s,alen) < tonum(b.s,blen);
     else
       return alen < blen;
   }
@@ -77,34 +78,50 @@ int main(){
   fscanf(fin,"%d%d%d",&A,&B,&N);
   int c;
   while ((c = fgetc(fin)) != '\n');
-  while ((c = fgetc(fin)) != EOF)
+  while ((c = fgetc(fin)) != EOF){
+    if (c == '\n')
+      continue;
     seq[I++] = c;
+  }
 
   solve();
   char buf[100];
   for (int i = 0; i < MAXP+1; ++i)
     for (int j = 0; j < MAXB+1; ++j)
-    if (sol[i][j]){
-      conv(buf,j,i);
-      freq rec;
-      rec.s = strdup(buf);
-      rec.n = sol[i][j];
-      solvec.push_back(rec);
-    }
+      if (sol[i][j]){
+        conv(buf,j,i);
+        freq rec;
+        rec.s = strdup(buf);
+        rec.n = sol[i][j];
+        solvec.push_back(rec);
+      }
   sort(solvec.begin(),solvec.end(),cmp);
+
+  /* Format output for online judge */  
   vector<freq>::iterator vi;
   int cur = solvec.begin()->n;
   int count = 1;
+  int line = 0;
   fprintf(fout,"%d\n", cur);
   for (vi = solvec.begin(); vi != solvec.end(); ++vi){
     if (vi->n != cur){
       if (count++ == N) break;
-      fprintf(fout,"\n%d\n%s ",vi->n,vi->s);
+      fprintf(fout,"%d\n",vi->n);
       cur = vi->n;
+      line = 0;
+    }
+    if (vi+1 == solvec.end() || (vi+1)->n != cur){
+      fprintf(fout,"%s\n",vi->s);
     }
     else{
-      fprintf(fout,"%s ",vi->s);
+      if (line == 5){
+        fprintf(fout,"%s\n",vi->s);
+        line = 0;
+      }
+      else{
+        fprintf(fout,"%s ",vi->s);
+        line++;
+      }
     }
   }
-
 }
