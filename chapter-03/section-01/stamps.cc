@@ -4,15 +4,10 @@ LANG: C++
 TASK: stamps
 Date: 11/05/2015
 Anaylsis:
-  At each index of dp,
-  we generate the next indexes by iterating
-  through the stamp values. dp[i] is the number
-  of stamps, therefore if dp[i] is greater than K,
-  we don't generate next index.
-
-  Also, if dp[i] has already been generated from
-  previous stamps, we set the minimum of stamps used
-
+We keep an array "dp" such that dp[i] is 
+the minimum number of stamps needed to make i cents. 
+For each stamp type, we try adding one stamp of that 
+type to each number of cents that we have already made. 
 
 */
 #include <cstdio>
