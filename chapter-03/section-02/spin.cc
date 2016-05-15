@@ -4,11 +4,25 @@ LANG: C++
 TASK: spin
 Date: 13/05/2015
 Anaylsis:
+  Making use of arrays of size 360 made it a lot easier
+  to process each of the wheel's wedges. Furthermore,
+  it seems that if wheel A at wedge from 90 to 270,
+  and wheel B has a wedge from 270 to 330,
+  there exists a gap at 270. ( This misunderstanding caused
+  quite the headache)
+
+  Note the following from the problem:
+  "The 'extent' also includes the original "degree" of the wedge,
+   so '0 180' means degrees 0..180 inclusive -- one more than 
+   most would imagine."
 */
 #include <cstdio>
 #include <cassert>
+#include <cstring>
 #define NWHEELS 5
 #define MAXWEDGE 5
+//#define DEBUG
+int counter = 0;
 typedef struct {
   int start,extent;
 } wedge;
@@ -17,39 +31,47 @@ typedef struct {
   wedge w[MAXWEDGE];
 } wheel;
 wheel W[NWHEELS];
-int aligned(int s,int e,int n){
-  if (n == NWHEELS){
-    return 1;
-  }
-  if (n == 0){
-    for (int i = 0; i < W[n].n; ++i)
-      if (aligned((W[n].cur+W[n].w[i].start)%360,W[n].w[i].extent,n+1))
-        return 1;
-  }
-  else{
-    int a1 = s;
-    int a2 = s+e;
-    for (int i = 0; i < W[n].n; ++i){
-      int w1 = W[n].cur+W[n].w[i].start;
-      int w2 = w1+W[n].w[i].extent;
-      if (w1 > 360 && w2 > 360){
-        w1%=360;
-        w2%=360;
-      }
-      printf("n:%d\ta1:%d\ta2:%d\tw1:%d\tw2:%d\n",n,a1,a2,w1,w2);
-      if (a1 <= w1 && w1 < a2){
-          int newextent = w2 <= a2 ? w2 - w1 : a2 - w1;
-          if (aligned(w1%360,newextent,n+1))
-            return 1;
-        }
-      else
-        if (w1 <= a1 && a1 < w2){
-          int newextent = a2 <= w2 ? a2 - a1 : w2 - a1;
-          if (aligned(a1%360,newextent,n+1))
-            return 1;
-        }
+
+int aligned(){
+  int alignment[360]; // opaque region
+  int cur[360]; // current wheel
+  memset(alignment,0,sizeof(alignment));
+  for (int i = 0; i < NWHEELS; ++i){
+    memset(cur,0,sizeof(cur));  
+    for (int j = 0; j < W[i].n; ++j){
+      int w1 = (W[i].cur+W[i].w[j].start)%360;
+      int w2 = (w1+W[i].w[j].extent)%360;
+      
+      for (int k = w1; k != w2; k = (k+1)%360)
+        cur[k] = 1;
+      cur[w2] = 1;
     }
+    for (int j = 0; j < 360; ++j)
+      if (cur[j] == 0)
+        alignment[j] = 1;
+
+#ifdef DEBUG    
+    printf("\n");
+    for (int j = 0; j < 360; ++j)
+      printf("%d",alignment[j]);
+    printf("\n");
+#endif
   }
+
+#ifdef DEBUG
+    for (int i = 0; i < NWHEELS; ++i){
+      for (int j = 0; j < W[i].n; ++j){
+        int w1 = (W[i].cur+W[i].w[j].start)%360;
+        int w2 = (w1+W[i].w[j].extent)%360;
+        printf("W:%d\tw1:%d\tw2:%d\n",i,w1,w2);
+      }
+    }
+#endif
+  for (int i = 0; i < 360; ++i){
+    if (alignment[i] == 0)
+      return 1;
+  }
+  
   return 0;
 }
 
@@ -71,34 +93,37 @@ int main(){
   assert(fin != NULL && fout != NULL);
   for (int i = 0; i < NWHEELS; ++i){
     fscanf(fin,"%d %d",&W[i].speed,&W[i].n);
-    for (int j = 0; j < W[i].n; ++j)
+    for (int j = 0; j < W[i].n; ++j){
       fscanf(fin,"%d %d",&W[i].w[j].start, &W[i].w[j].extent);
+    }
   }
   fclose(fin);
-  int counter = 0;
-  
-  while (aligned(0,0,0) == 0){
-    if (counter == 9)
-      break;
+ 
+  while (aligned() == 0){
     rotate();
+    counter++;
     if (origin()){
-      fprintf(fout,"none\n");
+      counter = -1;
       break;
     }
-    counter++;
   }
-  
-  for (int i = 0; i < NWHEELS; ++i){
-    int w1 = W[i].cur+W[i].w[0].start;
-    int w2 = w1+W[i].w[0].extent;
-      if (w1 > 360 && w2 > 360){
-        w1%=360;
-        w2%=360;
-      }
-    printf("n:%d\ta1:%d\ta2:%d\n",i,w1,w2);
-  }
+#ifdef DEBUG
+  // if (counter != -1)
+  //   for (int i = 0; i < NWHEELS; ++i){
+  //     for (int j = 0; j < W[i].n; ++j){
+  //       int w1 = (W[i].cur+W[i].w[j].start)%360;
+  //       int w2 = (w1+W[i].w[j].extent)%360;
+  //       printf("W:%d\tw1:%d\tw2:%d\n",i,w1,w2);
+  //     }
+  //   }
+#endif
 
-  fprintf(fout,"%d\n", counter);
+  if (counter != -1)
+    fprintf(fout,"%d\n",counter);
+  else
+    fprintf(fout,"none\n");
+      
+  
   fclose(fout);
   
   return 0;
