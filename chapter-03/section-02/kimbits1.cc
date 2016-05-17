@@ -41,26 +41,33 @@ int main(){
   assert(fin != NULL && fout != NULL);
   fscanf(fin,"%u%u%u",&N,&L,&I);
   fclose(fin);
-  unsigned n,ith;
+  
+  // Edge case
   if (I == 1){
-    n = 0;
-    ith = 1;
+    char buf[100];
+    conv(buf,0,N);
+    fprintf(fout,"%s\n",buf);
+    fclose(fout);
+    return 0;
   }
-  else if (I < (int) pow(2,L)){
-    n = I-1;
-    ith = I;; //+1 because 0 counts as an element
+  if (I == 2){
+    char buf[100];
+    conv(buf,1,N);
+    fprintf(fout,"%s\n",buf);
+    fclose(fout);
+    return 0;
   }
-  else
-    if (I >= (int) pow(2,L)){
-      n = (int) pow(2,L)-1;
-      ith = n+1;
-    }
-  while (ith < I){  
-    if (nbits(++n) <= L)
-      ith++;
+
+  int xtra = 1;
+  int num_invalid = 0;
+
+  while ((int) pow(2,L+xtra)-1 < I){
+    printf("pow: %d, I: %d\n",(int) pow(2,L+xtra)-1, I);
+    num_invalid += xtra++;
   }
+  printf("%d %d %d\n",I,num_invalid,xtra);
   char buf[100];
-  conv(buf,n,N);
+  conv(buf,I+num_invalid-1,N);
   fprintf(fout,"%s\n",buf);
   fclose(fout);
   return 0;
