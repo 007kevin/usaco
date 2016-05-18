@@ -4,35 +4,32 @@ LANG: C++
 TASK: kimbits
 Date: 15/05/2015
 Anaylsis:
-We know that if 2^L > I, then the I'th number is I-1 (since 0 counts as
-the 1st element of set S). If 2^L <= I, then we know the I'th number is greater
-than 2^L
+  setsize(N,L) = setsize(N-1,L) + setsize(N-1,L-1)
+  Given a bitstring, the I'th number will have its msp bit either 0 or 1.
+  We will know this by comparing setsize(N-1,L) >= I. If true, then we know I'th
+  element is within that set size and msb is '0'. Else I'th element is not within
+  that set therefore msb must be '1'. Continue with this recurrence relation to
+  build the I'th bitstring.
 */
 #include <cstdio>
 #include <cassert>
 #include <cmath>
+#define MAXN 31
+#define MAXL 31
 unsigned N,L,I;
-int nbits(int n){
-  int b = 0;
-  while (n){
-    n = n&(n-1);
-    b++;
-  }
-  return b;
-}
+unsigned dp[MAXN+1][MAXL+1];
 
-int conv(char *buf, unsigned n, int pad){
-  if (n == 0){
-    int i = 0;
-    for (i = 0; i < pad; ++i)
-      buf[i] = '0';
-    buf[i] = '\0';
-    return i;
-  }
-  int len = conv(buf,n/2,pad-1);
-  buf[len] = "01"[n%2];
-  buf[len+1] = '\0';
-  return len+1;
+unsigned setsize(int n, int l){
+  if (n == 0)
+    return 0;
+  if (l == 0)
+    return 1;
+  if (n <= l)
+    return (unsigned) pow(2,n);
+  if (dp[n][l])
+    return dp[n][l];
+  dp[n][l] = setsize(n-1,l)+setsize(n-1,l-1);
+  return dp[n][l];
 }
 
 int main(){
@@ -41,26 +38,23 @@ int main(){
   assert(fin != NULL && fout != NULL);
   fscanf(fin,"%u%u%u",&N,&L,&I);
   fclose(fin);
-  unsigned n,ith;
-  if (I == 1){
-    n = 0;
-    ith = 1;
-  }
-  else if (I < (int) pow(2,L)){
-    n = I-1;
-    ith = I;; //+1 because 0 counts as an element
-  }
-  else
-    if (I >= (int) pow(2,L)){
-      n = (int) pow(2,L)-1;
-      ith = n+1;
-    }
-  while (ith < I){  
-    if (nbits(++n) <= L)
-      ith++;
-  }
   char buf[100];
-  conv(buf,n,N);
+  unsigned size, n = N, l = L, i = I;
+  while (n > 0){
+    size = setsize(n-1,l);
+    // printf("%d %d %d %d\n",n,l,i,size);
+    // if size >= i, then we know i'th is within that set
+    if (i == 1 || size >= i){
+      buf[N-n] = '0';
+    }
+    else{ // if size < i, the i'th element is not in the set
+      buf[N-n] = '1';
+      i -= size;
+      l--;
+    }
+    n--;
+  }
+  buf[N] = '\0';
   fprintf(fout,"%s\n",buf);
   fclose(fout);
   return 0;
