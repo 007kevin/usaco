@@ -13,9 +13,11 @@ Anaylsis:
 #include <cstdio>
 #include <cstdlib>
 #include <cassert>
+#include <cstring>
 #define SIZE 8
 char init[SIZE+1] = "12348765";
 char target[SIZE+1];
+char sol[10000000];
 typedef struct node{ 
   char n;
   node *sib, *next;
@@ -61,8 +63,80 @@ void release_mem(node *ptr){
   free(ptr);
 }
 
+void moveA(){
+  char temp[SIZE/2];
+  for (int i = 0; i < SIZE/2; ++i)
+    temp[i] = init[i];
+  for (int i = 0; i < SIZE/2; ++i)
+    init[i] = init[i+SIZE/2];
+  for (int i = 0; i < SIZE/2; ++i)
+    init[i+SIZE/2] = temp[i];
+}
 
+void moveB(){
+  char tmp = init[SIZE/2-1];
+  for (int i = SIZE/2-1; i > 0; --i)
+    init[i] = init[i-1];
+  init[0] = tmp;
+  tmp = init[SIZE-1];
+  for (int i = SIZE-1; i > SIZE/2; --i)
+    init[i] = init[i-1];
+  init[SIZE/2] = tmp;
+}
+
+void moveC(){
+  char tmp = init[1];
+  init[1] = init[5];
+  init[5] = init[6];
+  init[6] = init[2];
+  init[2] = tmp;
+}
+
+void print(char *ptr){
+  for (int i = 0; i < SIZE/2; ++i)
+    printf("%c",ptr[i]);
+  printf("\n");
+  for (int i = SIZE/2; i < SIZE; ++i)
+    printf("%c",ptr[i]);
+  printf("\n");
+}
+
+void solve(int I){
+  if (strcmp(init,target) == 0){
+    sol[I] = '\0';
+    printf("solution: ");
+    for (int i = 0; i < I; ++i)
+      if (sol[i] == 'C')
+        printf("(C)");
+      else
+        printf("%c",sol[i]);
+    printf("\n\n");
+    //    printf("solution: %s\n",sol);
+    return;
+  }
+  if (find(HEAD,init,SIZE))
+    return;
+  HEAD = insert(HEAD,init,SIZE);
+
+  sol[I] = 'A';
+  moveA();
+  solve(I+1);
+  moveA();
+
+  sol[I] = 'B';
+  moveB();
+  solve(I+1);
+  moveB();
+  moveB();
+  moveB();
   
+  sol[I] = 'C';
+  moveC();
+  solve(I+1);
+  moveC();
+  moveC();
+  moveC();  
+}
 
 int main(){
   FILE *fin = fopen("msquare.in","r");
@@ -72,17 +146,10 @@ int main(){
   fscanf(fin,"%c %c %c %c ",target+7,target+6,target+5,target+4);
   target[SIZE] = '\0';
   fclose(fin);
-  printf("%s\n",target);
-  printf("%s\n",init);  
-  HEAD = insert(HEAD,target,SIZE);
-  HEAD = insert(HEAD,init,SIZE);
-  printf("%d\n",find(HEAD,target,SIZE));
-  printf("%d\n",find(HEAD,init,SIZE));
 
+  solve(0);
   
   release_mem(HEAD);
-  fclose(fout);
+  fclose(fout);        
   return 0;
 }
-  
-
