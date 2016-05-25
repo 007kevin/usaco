@@ -4,100 +4,102 @@ LANG: C++
 TASK: butter
 Date: 22/05/2015
 Anaylsis:
-  We will implement the MST to find the min. path
-  the cows must walk to the sugar cube.
-  How do we deal with pastures where there are no cows?
-  -- Changing any element is a MST generally requires complete recalculation.
-  -- Approach building of MST with all pastures, but when a non-cow pasture is added
-     to the tree, don't include into the total tree sum. BUT from a non-cow pasture node,
-     a cow-pasture is added, add what was previously skipped.
+  For each pasture having at least 1 cow, perform disjtra's algorithm
+  to find the minimum total distance walked by the cows.
+
+
+
+  Note: A pasture can have more than 1 cow, so if a pasture with two cows
+        are added to the tree, the distance is doubled.
+
+  Solved. Writing dijkstra's algorithm with binary heap was interesting.
 */
 #include <iostream>
 #include <fstream>
 #include <climits>
-#include <cstring>
 #include <vector>
+#include <queue>
+#include <map>
 #define MAXP 801
 #define infinity INT_MAX
 using namespace std;
 
 ifstream fin("butter.in");
 ofstream fout("butter.out");
-int N,P,C,Walk;
-vector<int> tree;
-int matrix[MAXP][MAXP];
-struct pasture{
-  bool c,v;
+int N,P,C;
+int pasture[MAXP];
+struct node{
+  int pasture,dist;
+  bool operator<(const node& rhs) const{
+    return dist > rhs.dist;
+  }
 };
-pasture pasture[MAXP];
-int pdist(int p1, int p2){
-  if (p1 == p2)
-    return 0;
-  int dist = matrix[p1][p2];
-  for (int i = 1; i <= P; ++i)
-    if (matrix[p1][i] != infinity &&
-        pasture[i].c == false){
-      
-      };
-    }
-  if (dist != infinity)
-    return matrix[p1][p2] + dist;
-  else
-    return infinity;
-}
+map<int,map<int,int> > AL;
+map<int,int>::iterator it;
 
 int main(){
+  ios::sync_with_stdio(false);   
   fin>>N>>P>>C;
   int n;
   for (int i = 0; i < N; ++i){
     fin>>n;
-    pasture[n].c = true;
+    pasture[n]++; // Store number of cows per pasture
   }
-  // for (int i = 1; i <= P; ++i)
-  //   for (int j = 1; j <= P; ++j)
-  //     matrix[i][j] = infinity;
-
   int p1,p2,w;
   for (int i = 0; i < C; ++i){
     fin>>p1>>p2>>w;
-    matrix[p1][p2] = w;
+    // Fill up adjacency list for faster lookup
+    AL[p1][p2] = w;
+    AL[p2][p1] = w;;
   }
-  for (int i = 1; i <= P; ++i){
-    for (int j =1; j <= P; ++j)
-      printf("%d", matrix[i][j]);
-    printf("\n");
-  }
-  printf("%d\n",pdist(2,3));
-  // optimize the matrix by replacing weights between cow-containing
-  // pastures with possible lower alternative paths that goes
-  // through intermediary non-cow pastures. Then the MST algorithm
-  // is simplified because we can focus on only the cow-containing
-  // pastures for building the tree.
-  // int dist;
-  // for (int i = 1; i <= P; ++i)
-  //   for (int j = 1; j <= P; ++j){
-  //     if (pasture[i].c && pasture[j].c){
-  //       dist = pdist(i,j);
-  //       if (dist < matrix[i][j])
-  //         matrix[i][j] = dist;
-  //     }
-  //   }
-
-  // int f = 0;
-  // for (f = 0; f < P; ++f)
-  //   if (pasture[f].c) break;
-  // pasture[f].v = true;
-  // tree.push_back(f);
-  // while (tree.size() < C){
-  //   int p,min = infinity;
-  //   vector<int>::iterator it;
-  //   for (it = tree.begin(); it != tree.end(); ++it)
-  //     ;
-  // }
-  
-    
-    
   fin.close();
+  
+  int sol = infinity;
+  int dist[MAXP];
+  int visited[MAXP];
+  for (int i = 1; i <= P; ++i){
+    dist[i] = infinity;
+    visited[i] = 0;
+  }
+  for (int c = 1; c <= P; ++c){
+    int walk = 0;
+    vector<int> tree;
+    priority_queue<node> min;
+    dist[c] = 0;
+    node source = {c,dist[c]};
+    min.push(source);
+    while (tree.size() < P){
+      node minnode = min.top(); min.pop();
+      if(visited[minnode.pasture] == 1)
+        continue;
+      
+      walk+=dist[minnode.pasture]*pasture[minnode.pasture];
+      if (walk > sol) break;
+
+      tree.push_back(minnode.pasture);
+      visited[minnode.pasture] = 1;
+      for (it = AL[minnode.pasture].begin();
+           it != AL[minnode.pasture].end();
+           ++it){
+        if (visited[it->first] == 0)
+          if (minnode.dist + it->second < dist[it->first]){
+            dist[it->first] = minnode.dist + it->second;
+            node n = {it->first, minnode.dist + it->second};
+            min.push(n);
+          }
+      }
+    }
+    //cout << "----" << endl;
+    for (int i = 1; i <= P; ++i){
+      //cout << i << ":" << dist[i] << endl;
+      dist[i] = infinity;
+      visited[i] = 0;
+    }
+    sol = walk < sol ? walk : sol;
+  }
+  
+  fout << sol << endl;
+
   fout.close();
   return 0;
 }
