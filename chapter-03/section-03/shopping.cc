@@ -10,6 +10,7 @@ Anaylsis:
 #include <cstdio>
 #include <cassert>
 #include <algorithm>
+#define DEBUG
 #define MAXN 5
 #define MAXS 99
 #define MAXC 999
@@ -54,6 +55,18 @@ int main(){
       actual+=price[cur->c[j]]*cur->k[j];
     cur->p = actual;
   }
+
+#ifdef DEBUG
+  printf("s\tr\tp\tn\tc\tk\n");
+  for (int i = 0; i < s; ++i){
+    printf("%d\t%d\t%d\t%d\tc\t\k\n",
+           i,S[i].r,S[i].p,S[i].n);
+    for (int j = 0; j < S[i].n; ++j)
+      printf(" \t \t \t \t%d\t\%d\n",
+             S[i].c[j],S[i].k[j]);
+  }
+#endif
+  
   // Sort the special offers by amount saved
   sort(S,S+s);
 
