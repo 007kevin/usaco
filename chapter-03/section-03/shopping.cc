@@ -19,7 +19,6 @@ Anaylsis:
 */
 #include <cstdio>
 #include <cassert>
-#include <climits>
 #include <algorithm>
 //#define DEBUG
 #define MAXN 5
@@ -34,41 +33,33 @@ struct special_offer{
   }
 };
 special_offer S[MAXS];
-int s,solution = INT_MAX;
+int s;
 int amt[MAXC+1];
 int price[MAXC+1];
+int memo[MAXS+1];
 
 void solve(int cprice, int I){
-  if (I == s){
-    for (int i = 1; i <= MAXC; ++i)
-      cprice+=amt[i]*price[i];
-    solution = cprice < solution ? cprice : solution;
-#ifdef DEBUG
-    printf("cprice: %d\n", cprice);
-#endif
+  if (memo[I] != 0 && cprice > memo[I])
     return;
-  }
-  int same = 1;
-  // while (I+same < s && S[I].s == S[I+same].s)
-  //   same++;
+  memo[I] = cprice;
+  if (I == s)
+    return;
+  printf("%d\n",cprice);
   special_offer *cur;
-  for (int i = 0; i < same; ++i){
-    cur = &S[I+i];
-    int flag = 1;
-    for (int j = 0; j < cur->n; ++j)
-      if (amt[cur->c[j]] - cur->k[j] < 0){
-        flag = 0; break;
-      }
-    if (flag){
-      for (int j = 0; j < cur->n; ++j){
-        amt[cur->c[j]]-=cur->k[j];
-      }
-      solve(cprice + cur->r, I);
-      for (int j = 0; j < cur->n; ++j){
-        amt[cur->c[j]]+=cur->k[j];
-      }
+  cur = &S[I];
+  int flag = 1;
+  for (int j = 0; j < cur->n; ++j)
+    if (amt[cur->c[j]] - cur->k[j] < 0){
+      flag = 0; break;
     }
-    
+  if (flag){
+    for (int j = 0; j < cur->n; ++j){
+      amt[cur->c[j]]-=cur->k[j];
+    }
+    solve(cprice - cur->s, I);
+    for (int j = 0; j < cur->n; ++j){
+      amt[cur->c[j]]+=cur->k[j];
+    }
   }
   solve(cprice, I+1);
 }
@@ -103,9 +94,6 @@ int main(){
     cur->s = cur->p - cur->r;
   }
 
-  // Sort the special offers by amount saved
-  sort(S,S+s);
-  
 #ifdef DEBUG
   printf("s\tr\tp\ts\tn\tc\tk\n");
   for (int i = 0; i < s; ++i){
@@ -116,10 +104,14 @@ int main(){
              S[i].c[j],S[i].k[j]);
   }
 #endif
+  int maxprice = 0;
+  for (int i = 1; i <= MAXC; ++i)
+    maxprice+=price[i]*amt[i];
 
-  solve(0,0);
-  
-  fprintf(fout,"%d\n",solution);
+  sort(S,S+s);
+  solve(maxprice,0);
+
+  fprintf(fout,"%d\n",memo[s]);
 
   fclose(fout);
   return 0;
