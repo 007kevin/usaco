@@ -6,6 +6,14 @@ Date: 25/05/2015
 Anaylsis:
   For each special offer, we calculated the amount saved,
   then apply greedy algorithm against the items required.
+
+  What happens when the amount saved are the same for
+  different special offers? 
+    - Should we choose the one that optimally allows the
+      choosing of other special offers down the road?
+      - Anytime we come across special offers of the same price,
+        attempt all combinations of taking those special offers
+        
 */
 #include <cstdio>
 #include <cassert>
@@ -34,8 +42,8 @@ int main(){
   fscanf(fin,"%d",&s);
   for (int i = 0; i < s; ++i){
     fscanf(fin,"%d",&S[i].n);
-    for (int j = 0; j < S[i].n; ++i)
-      fscanf(fin,"%d%d",&S[i].c[j],&S[i].k[j]);
+    for (int j = 0; j < S[i].n; ++j)
+      fscanf(fin,"%d %d",&S[i].c[j],&S[i].k[j]);
     fscanf(fin,"%d",&S[i].r);
   }
   int b;
@@ -56,20 +64,20 @@ int main(){
     cur->p = actual;
   }
 
+  // Sort the special offers by amount saved
+  sort(S,S+s);
+  
 #ifdef DEBUG
-  printf("s\tr\tp\tn\tc\tk\n");
+  printf("s\tr\tp\tp-r\tn\tc\tk\n");
   for (int i = 0; i < s; ++i){
-    printf("%d\t%d\t%d\t%d\tc\t\k\n",
-           i,S[i].r,S[i].p,S[i].n);
+    printf("%d\t%d\t%d\t%d\t%d\tc\tk\n",
+           i,S[i].r,S[i].p,S[i].p-S[i].r,S[i].n);
     for (int j = 0; j < S[i].n; ++j)
       printf(" \t \t \t \t%d\t\%d\n",
              S[i].c[j],S[i].k[j]);
   }
 #endif
   
-  // Sort the special offers by amount saved
-  sort(S,S+s);
-
   int solution = 0;
   for (int i = 0; i < s; ++i){
     cur = &S[i];
@@ -82,7 +90,6 @@ int main(){
     if (flag){
       for (int j = 0; j < cur->n; ++j){
         amt[cur->c[j]]-=cur->k[j];
-        printf("%d\n",amt[cur->c[j]]);
       }
       solution+=cur->r;
       i--; // Try again on the current special offer
@@ -90,8 +97,8 @@ int main(){
   }
   for (int i = 1; i <= MAXC; ++i)
     solution+=amt[i]*price[i];
-  
 
+  fprintf(fout,"%d\n",solution);
 
   fclose(fout);
   return 0;
