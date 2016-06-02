@@ -2,7 +2,7 @@
 ID: min_j
 LANG: C++
 TASK: shopping
-Date: 25/05/2015
+Date: 25/05/2016
 Anaylsis:
   We use dynamic programming know that the shopping cart has at most
   6^5 different states. By using the set of offers, we build up an 

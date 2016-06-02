@@ -2,7 +2,7 @@
 ID: min_j
 LANG: C++
 TASK: shopping
-Date: 25/05/2015
+Date: 25/05/2016
 Anaylsis:
   For each special offer, we calculated the amount saved,
   then apply greedy algorithm against the items required.

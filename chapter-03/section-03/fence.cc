@@ -2,7 +2,7 @@
 ID: min_j
 LANG: C++
 TASK: fence
-Date: 24/05/2015
+Date: 24/05/2016
 Anaylsis:
   A graph has an Eulerian tour/path if and only if it is connected
   and every node except two has even degree. The nodes of odd degrees
