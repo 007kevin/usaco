@@ -27,11 +27,10 @@ struct coord {
 };
 char piece[MROW][MCOL];
 int boards[MROW*MCOL][MROW][MCOL];
-int K,Krow[MROW],Kcol[MCOL];
+int K,Krow[MROW],Kcol[MCOL]; // King is when K=0
 
-bool valid(int (*board)[MCOL], int r, int c, int step){
-  if (r < 0 || r >= R || c < 0 || c >= C ||
-      board[r][c] < step)
+bool valid(int (*board)[MCOL], int r, int c){
+  if (r < 0 || r >= R || c < 0 || c >= C)
     return false;
   return true;
 }
@@ -45,48 +44,149 @@ void bfs_from(int (*board)[MCOL], int r, int c){
     coord cur = Q.top(); Q.pop();
     step = cur.d + 1;
     cr = cur.r-1; cc = cur.c+2;
-    if (valid(board,cr,cc,step)){
+    if (valid(board,cr,cc) && step < board[cr][cc]){
       board[cr][cc] = step;
       Q.push(coord(cr,cc,step));
     }
     cr = cur.r-1; cc = cur.c-2;    
-    if (valid(board,cr,cc,step)){
+    if (valid(board,cr,cc) && step < board[cr][cc]){
       board[cr][cc] = step;
       Q.push(coord(cr,cc,step));
     }
     cr = cur.r+1; cc = cur.c+2;    
-    if (valid(board,cr,cc,step)){
+    if (valid(board,cr,cc) && step < board[cr][cc]){
       board[cr][cc] = step;
       Q.push(coord(cr,cc,step));
     }
     cr = cur.r+1; cc = cur.c-2;    
-    if (valid(board,cr,cc,step)){
+    if (valid(board,cr,cc) && step < board[cr][cc]){
       board[cr][cc] = step;
       Q.push(coord(cr,cc,step));
     }    
     cr = cur.r+2; cc = cur.c-1;    
-    if (valid(board,cr,cc,step)){
+    if (valid(board,cr,cc) && step < board[cr][cc]){
       board[cr][cc] = step;
       Q.push(coord(cr,cc,step));
     }    
     cr = cur.r-2; cc = cur.c-1;    
-    if (valid(board,cr,cc,step)){
+    if (valid(board,cr,cc) && step < board[cr][cc]){
       board[cr][cc] = step;
       Q.push(coord(cr,cc,step));
     }    
     cr = cur.r+2; cc = cur.c+1;    
-    if (valid(board,cr,cc,step)){
+    if (valid(board,cr,cc) && step < board[cr][cc]){
       board[cr][cc] = step;
       Q.push(coord(cr,cc,step));
     }    
     cr = cur.r-2; cc = cur.c+1;    
-    if (valid(board,cr,cc,step)){
+    if (valid(board,cr,cc) && step < board[cr][cc]){
       board[cr][cc] = step;
       Q.push(coord(cr,cc,step));
     }    
     step++;
   }
+}
+void bfs_king(int (*board)[MCOL], int r, int c){
+  priority_queue<coord> Q;
+  int step = 0,cr,cc;
+  board[r][c] = step;
+  Q.push(coord(r,c,step));
+  while(!Q.empty()){
+    coord cur = Q.top(); Q.pop();
+    step = cur.d + 1;
+    cr = cur.r-1; cc = cur.c;
+    if (valid(board,cr,cc) && step < board[cr][cc]){
+      board[cr][cc] = step;
+      Q.push(coord(cr,cc,step));
+    }
+    cr = cur.r-1; cc = cur.c+1;    
+    if (valid(board,cr,cc) && step < board[cr][cc]){
+      board[cr][cc] = step;
+      Q.push(coord(cr,cc,step));
+    }
+    cr = cur.r; cc = cur.c+1;    
+    if (valid(board,cr,cc) && step < board[cr][cc]){
+      board[cr][cc] = step;
+      Q.push(coord(cr,cc,step));
+    }
+    cr = cur.r+1; cc = cur.c+1;    
+    if (valid(board,cr,cc) && step < board[cr][cc]){
+      board[cr][cc] = step;
+      Q.push(coord(cr,cc,step));
+    }    
+    cr = cur.r+1; cc = cur.c;    
+    if (valid(board,cr,cc) && step < board[cr][cc]){
+      board[cr][cc] = step;
+      Q.push(coord(cr,cc,step));
+    }    
+    cr = cur.r+1; cc = cur.c-1;    
+    if (valid(board,cr,cc) && step < board[cr][cc]){
+      board[cr][cc] = step;
+      Q.push(coord(cr,cc,step));
+    }    
+    cr = cur.r; cc = cur.c-1;    
+    if (valid(board,cr,cc) && step < board[cr][cc]){
+      board[cr][cc] = step;
+      Q.push(coord(cr,cc,step));
+    }    
+    cr = cur.r-1; cc = cur.c-1;    
+    if (valid(board,cr,cc) && step < board[cr][cc]){
+      board[cr][cc] = step;
+      Q.push(coord(cr,cc,step));
+    }    
+    step++;
+  }
+}
 
+int king_moves(int (*board)[MCOL], int r, int c){
+  priority_queue<coord> Q;
+  int moves = 0, step = 0,cr,cc;
+  Q.push(coord(r,c,step));
+  while(!Q.empty() && step <= boards[0][r][c]){
+    coord cur = Q.top(); Q.pop();
+    step = cur.d + 1;
+    cr = cur.r-1; cc = cur.c;
+    if (valid(board,cr,cc) && step < board[cr][cc]){
+      board[cr][cc] = step;
+      Q.push(coord(cr,cc,step));
+    }
+    cr = cur.r-1; cc = cur.c+1;    
+    if (valid(board,cr,cc) && step < board[cr][cc]){
+      board[cr][cc] = step;
+      Q.push(coord(cr,cc,step));
+    }
+    cr = cur.r; cc = cur.c+1;    
+    if (valid(board,cr,cc) && step < board[cr][cc]){
+      board[cr][cc] = step;
+      Q.push(coord(cr,cc,step));
+    }
+    cr = cur.r+1; cc = cur.c+1;    
+    if (valid(board,cr,cc) && step < board[cr][cc]){
+      board[cr][cc] = step;
+      Q.push(coord(cr,cc,step));
+    }    
+    cr = cur.r+1; cc = cur.c;    
+    if (valid(board,cr,cc) && step < board[cr][cc]){
+      board[cr][cc] = step;
+      Q.push(coord(cr,cc,step));
+    }    
+    cr = cur.r+1; cc = cur.c-1;    
+    if (valid(board,cr,cc) && step < board[cr][cc]){
+      board[cr][cc] = step;
+      Q.push(coord(cr,cc,step));
+    }    
+    cr = cur.r; cc = cur.c-1;    
+    if (valid(board,cr,cc) && step < board[cr][cc]){
+      board[cr][cc] = step;
+      Q.push(coord(cr,cc,step));
+    }    
+    cr = cur.r-1; cc = cur.c-1;    
+    if (valid(board,cr,cc) && step < board[cr][cc]){
+      board[cr][cc] = step;
+      Q.push(coord(cr,cc,step));
+    }    
+    step++;
+  }
 }
 
 void reset(int (*board)[MCOL]){
@@ -131,6 +231,9 @@ int main(){
     K++;
   }
   fin.close();
+
+  reset(boards[0]);
+  bfs_king(boards[0],Krow[0],Kcol[0]);
 
   for (int i = 1; i < K; ++i){
     reset(boards[i]);
