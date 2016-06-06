@@ -24,7 +24,7 @@ int K,Krow[MROW*MCOL],Kcol[MROW*MCOL]; // King is when K=0
 int piece[MROW][MCOL];
 int board[MROW][MCOL];
 struct coord {
-  int r,c,d;
+  unsigned char r,c,d;
   coord(int row,int col,int dist){
     r = row; c = col; d = dist;
   }
@@ -79,9 +79,7 @@ int bfs_from(int (*board)[MCOL], int r, int c){
       }
     }
     for (int i = 0; i < 8; ++i)
-      if (valid(board,cur.r+mover[i],cur.c+movec[i]) &&
-          board[cur.r+mover[i]][cur.c+movec[i]] == infinity)
-        Q.push(coord(cur.r+mover[i],cur.c+movec[i],cur.d+1));
+      Q.push(coord(cur.r+mover[i],cur.c+movec[i],cur.d+1));
   }
   for (int i = 1; i < K; ++i)
     gather+=board[Krow[i]][Kcol[i]];
@@ -129,8 +127,9 @@ int main(){
   fin.close();
   int solution = infinity;
   for(int i = 0; i < R; ++i)
-    for (int j = 0; j < C; ++j)
+    for (int j = 0; j < C; ++j){
       solution = min(solution,bfs_from(board,i,j));
+    }
 
   fout << solution << endl;
 
