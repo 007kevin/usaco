@@ -14,6 +14,7 @@ Anaylsis:
 using namespace std;
 #define infinity INT_MAX
 #define max(a,b) (a) < (b) ? b : a
+#define min(a,b) (a) < (b) ? a : b
 #define MROW 30
 #define MCOL 26
 int R,C;
@@ -47,6 +48,7 @@ int king_from(int r, int c){
 int bfs_from(int (*board)[MCOL], int r, int c){
   reset(board);
   int knights = 0;
+  int gather = 0;
   int minking = king_from(r,c);
   queue<coord> Q;
   Q.push(coord(r,c,0));
@@ -60,16 +62,28 @@ int bfs_from(int (*board)[MCOL], int r, int c){
     //Backtrack from found knight to initial
     //position to track the lowest king steps
     if (piece[cur.r][cur.c] == 1){
-      int step = cur.d-1;
-      int backtrack_r = cur.d;
-      int backtrack_c = cur.c;
-      while(board[backtrack_r][backtrack_c] != 0){
-        x
+      knights++;
+      if (minking != 0){
+        queue<coord> B;
+        B.push(cur);
+        while(!B.empty()){
+          coord back = B.front(); B.pop();
+          if (!valid(board,back.r,back.c))     continue;
+          if (board[back.r][back.c] != back.d) continue;
+          if (board[back.r][back.c] == 0)      continue;
+          minking = min(minking,king_from(back.r,back.c));
+          for (int i = 0; i < 8; ++i)
+            if (piece[back.r+mover[i]][back.c+movec[i]] != 1)
+              B.push(coord(back.r+mover[i],back.c+movec[i],back.d-1));
+        }
       }
     }
     for (int i = 0; i < 8; ++i)
       Q.push(coord(cur.r+mover[i],cur.c+movec[i],cur.d+1));
   }
+  for (int i = 1; i < K; ++i)
+    gather+=board[Krow[i]][Kcol[i]];
+  return minking + gather;
 }
 
 void debugprint(int (*board)[MCOL]){
@@ -108,8 +122,14 @@ int main(){
     K++;
   }
   fin.close();
+  int solution = infinity;
+  for(int i = 0; i < R
 
-  debugprint(piece);
+  fout << bfs_from(board,4,1) << endl;
+
+  // debugprint(piece);
+  // debugprint(board);
+  
   
   
   
