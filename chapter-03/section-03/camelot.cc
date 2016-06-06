@@ -12,11 +12,16 @@ Anaylsis:
 #include <climits>
 #include <cassert>
 using namespace std;
-//#define DEBUG
+#define DEBUG
 #define infinity INT_MAX
 #define MROW 30
 #define MCOL 26
 int R,C;
+int mover[] = {-1,-1,+1,+1,+2,-2,+2,-2};
+int movec[] = {+2,-2,+2,-2,-1,-1,+1,+1};
+int kingr[] = {-1,-1,0,+1,+1,+1,0,-1};
+int kingc[] = {0,+1,+1,+1,0,-1,-1,-1};
+
 struct coord {
   int r,c,d;
   coord(int row,int col, int dist){
@@ -36,203 +41,31 @@ bool valid(int (*board)[MCOL], int r, int c){
   return true;
 }
 
-void spa_from(int (*board)[MCOL], int r, int c){
-  priority_queue<coord> Q;
-  int step = 0,cr,cc;
-  board[r][c] = step;
-  Q.push(coord(r,c,step));
+void bfs_from(int (*board)[MCOL], int r, int c){
+  queue<coord> Q;
+  Q.push(coord(r,c,0));
   while(!Q.empty()){
-    coord cur = Q.top(); Q.pop();
-    step = cur.d + 1;
-    cr = cur.r-1; cc = cur.c+2;
-    if (valid(board,cr,cc) && step < board[cr][cc]){
-      board[cr][cc] = step;
-      Q.push(coord(cr,cc,step));
-    }
-    cr = cur.r-1; cc = cur.c-2;    
-    if (valid(board,cr,cc) && step < board[cr][cc]){
-      board[cr][cc] = step;
-      Q.push(coord(cr,cc,step));
-    }
-    cr = cur.r+1; cc = cur.c+2;    
-    if (valid(board,cr,cc) && step < board[cr][cc]){
-      board[cr][cc] = step;
-      Q.push(coord(cr,cc,step));
-    }
-    cr = cur.r+1; cc = cur.c-2;    
-    if (valid(board,cr,cc) && step < board[cr][cc]){
-      board[cr][cc] = step;
-      Q.push(coord(cr,cc,step));
-    }    
-    cr = cur.r+2; cc = cur.c-1;    
-    if (valid(board,cr,cc) && step < board[cr][cc]){
-      board[cr][cc] = step;
-      Q.push(coord(cr,cc,step));
-    }    
-    cr = cur.r-2; cc = cur.c-1;    
-    if (valid(board,cr,cc) && step < board[cr][cc]){
-      board[cr][cc] = step;
-      Q.push(coord(cr,cc,step));
-    }    
-    cr = cur.r+2; cc = cur.c+1;    
-    if (valid(board,cr,cc) && step < board[cr][cc]){
-      board[cr][cc] = step;
-      Q.push(coord(cr,cc,step));
-    }    
-    cr = cur.r-2; cc = cur.c+1;    
-    if (valid(board,cr,cc) && step < board[cr][cc]){
-      board[cr][cc] = step;
-      Q.push(coord(cr,cc,step));
-    }    
+    coord cur = Q.front(); Q.pop();
+    if (!valid(board,cur.r,cur.c) ||
+        board[cur.r][cur.c] != infinity)
+      continue;
+    board[cur.r][cur.c] = cur.d;
+    for (int i = 0; i < 8; ++i)
+      Q.push(coord(cur.r+mover[i],cur.c+movec[i],cur.d+1));
   }
 }
 
 void bfs_king(int (*board)[MCOL], int r, int c){
-  priority_queue<coord> Q;
-  int step = 0,cr,cc;
-  board[r][c] = step;
-  Q.push(coord(r,c,step));
+  queue<coord> Q;
+  Q.push(coord(r,c,0));
   while(!Q.empty()){
-    coord cur = Q.top(); Q.pop();
-    step = cur.d + 1;
-    cr = cur.r-1; cc = cur.c;
-    if (valid(board,cr,cc) && step < board[cr][cc]){
-      board[cr][cc] = step;
-      Q.push(coord(cr,cc,step));
-    }
-    cr = cur.r-1; cc = cur.c+1;    
-    if (valid(board,cr,cc) && step < board[cr][cc]){
-      board[cr][cc] = step;
-      Q.push(coord(cr,cc,step));
-    }
-    cr = cur.r; cc = cur.c+1;    
-    if (valid(board,cr,cc) && step < board[cr][cc]){
-      board[cr][cc] = step;
-      Q.push(coord(cr,cc,step));
-    }
-    cr = cur.r+1; cc = cur.c+1;    
-    if (valid(board,cr,cc) && step < board[cr][cc]){
-      board[cr][cc] = step;
-      Q.push(coord(cr,cc,step));
-    }    
-    cr = cur.r+1; cc = cur.c;    
-    if (valid(board,cr,cc) && step < board[cr][cc]){
-      board[cr][cc] = step;
-      Q.push(coord(cr,cc,step));
-    }    
-    cr = cur.r+1; cc = cur.c-1;    
-    if (valid(board,cr,cc) && step < board[cr][cc]){
-      board[cr][cc] = step;
-      Q.push(coord(cr,cc,step));
-    }    
-    cr = cur.r; cc = cur.c-1;    
-    if (valid(board,cr,cc) && step < board[cr][cc]){
-      board[cr][cc] = step;
-      Q.push(coord(cr,cc,step));
-    }    
-    cr = cur.r-1; cc = cur.c-1;    
-    if (valid(board,cr,cc) && step < board[cr][cc]){
-      board[cr][cc] = step;
-      Q.push(coord(cr,cc,step));
-    }    
-  }
-}
-
-bool knight_move(const coord& cur, int r, int c){
-  for (int i = 1; i < K; ++i)
-    if (boards[i][r][c] - boards[i][cur.r][cur.c] == cur.d)
-      return true;
-  return false;
-}
-
-bool backtrack(int (*board)[MCOL],int r, int c, coord cur){
-  if (!knight_move(cur,r,c))
-    return false;
-    
-  int cr,cc,step = cur.d + 1;
-  cr = cur.r-1; cc = cur.c+2;
-  if (valid(board,cr,cc))
-    if (backtrack(board,r,c,coord(cr,cc,step)))
-      board[cr][cc] = step;
-        
-  cr = cur.r-1; cc = cur.c-2;    
-  if (valid(board,cr,cc))
-    if (backtrack(board,r,c,coord(cr,cc,step)))
-      board[cr][cc] = step;
-
-  cr = cur.r+1; cc = cur.c+2;    
-  if (valid(board,cr,cc))
-    if (backtrack(board,r,c,coord(cr,cc,step)))
-      board[cr][cc] = step;
-  
-  cr = cur.r+1; cc = cur.c-2;    
-  if (valid(board,cr,cc))
-    if (backtrack(board,r,c,coord(cr,cc,step)))
-      board[cr][cc] = step;
-  
-  cr = cur.r+2; cc = cur.c-1;    
-  if (valid(board,cr,cc))
-    if (backtrack(board,r,c,coord(cr,cc,step)))
-      board[cr][cc] = step;
-  
-  cr = cur.r-2; cc = cur.c-1;    
-  if (valid(board,cr,cc))
-    if (backtrack(board,r,c,coord(cr,cc,step)))
-      board[cr][cc] = step;
-  
-  cr = cur.r+2; cc = cur.c+1;    
-  if (valid(board,cr,cc))
-    if (backtrack(board,r,c,coord(cr,cc,step)))
-      board[cr][cc] = step;
-  
-  cr = cur.r-2; cc = cur.c+1;    
-  if (valid(board,cr,cc))
-    if (backtrack(board,r,c,coord(cr,cc,step)))
-      board[cr][cc] = step;
-  
-  return true;
-}
-
-int nearest_knight(int (*board)[MCOL]){
-  priority_queue<coord> Q;
-  Q.push(coord(Krow[0],Kcol[0],0));
-  while (!Q.empty()){
-    coord cur = Q.top(); Q.pop();
-    if (board[cur.r][cur.c] != infinity)
-      return cur.d;
-    
-    int cr,cc,step = cur.d + 1;
-    cr = cur.r-1; cc = cur.c;
-    if (valid(board,cr,cc))
-      Q.push(coord(cr,cc,step));
-
-    cr = cur.r-1; cc = cur.c+1;    
-    if (valid(board,cr,cc))
-      Q.push(coord(cr,cc,step));
-
-    cr = cur.r; cc = cur.c+1;    
-    if (valid(board,cr,cc))
-      Q.push(coord(cr,cc,step));
-
-    cr = cur.r+1; cc = cur.c+1;    
-    if (valid(board,cr,cc))
-      Q.push(coord(cr,cc,step));
-
-    cr = cur.r+1; cc = cur.c;    
-    if (valid(board,cr,cc))
-      Q.push(coord(cr,cc,step));
-
-    cr = cur.r+1; cc = cur.c-1;    
-    if (valid(board,cr,cc))
-      Q.push(coord(cr,cc,step));
-
-    cr = cur.r; cc = cur.c-1;    
-    if (valid(board,cr,cc))
-      Q.push(coord(cr,cc,step));
-
-    cr = cur.r-1; cc = cur.c-1;    
-    if (valid(board,cr,cc))
-      Q.push(coord(cr,cc,step));
+    coord cur = Q.front(); Q.pop();
+    if (!valid(board,cur.r,cur.c) ||
+        board[cur.r][cur.c] != infinity)
+      continue;
+    board[cur.r][cur.c] = cur.d;
+    for (int i = 0; i < 8; ++i)
+      Q.push(coord(cur.r+kingr[i],cur.c+kingc[i],cur.d+1));
   }
 }
 
@@ -240,6 +73,7 @@ void reset(int (*board)[MCOL]){
   for (int i = 0; i < R*C; ++i)
     board[i/C][i%C] = infinity;
 }
+
 #ifdef DEBUG
 void debugprint(int (*board)[MCOL]){
   cout << endl;
@@ -261,7 +95,7 @@ void debugprint(int (*board)[MCOL]){
 #endif
 
 int main(){
-  ifstream fin("camelot.in");
+  ifstream fin("camelot.in.t");
   ofstream fout("camelot.out");
   assert(fin.is_open() && fout.is_open());
   fin>>R>>C;
@@ -290,7 +124,7 @@ int main(){
 
   for (int i = 1; i < K; ++i){
     reset(boards[i]);
-    spa_from(boards[i],Krow[i],Kcol[i]);
+    bfs_from(boards[i],Krow[i],Kcol[i]);
   }
 
   int output[MROW][MCOL];
@@ -305,20 +139,7 @@ int main(){
           minimum = output[i][j];
       }
     }
-  int solution = infinity;
-  int crossref[MROW][MCOL];
-  for (int i = 0; i < R; ++i)
-    for (int j = 0; j < C; ++j){
-      if (output[i][j] == minimum){
-        reset(crossref);
-        crossref[i][j] = 0;
-        backtrack(crossref,i,j,coord(i,j,0));
-        int near =  nearest_knight(crossref);
-        if (near < solution)
-          solution = near;
-      }
-    }
-  fout << minimum + solution << endl;
+
   
 #ifdef DEBUG
   cout << "  ";
@@ -340,8 +161,6 @@ int main(){
     debugprint(boards[k]);
   debugprint(output);
 
-  debugprint(crossref);
-  //  cout << near << endl;
 #endif
   
   fout.close();  
