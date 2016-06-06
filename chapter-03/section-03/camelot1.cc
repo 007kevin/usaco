@@ -68,21 +68,26 @@ int bfs_from(int (*board)[MCOL], int r, int c){
         B.push(cur);
         while(!B.empty()){
           coord back = B.front(); B.pop();
-          if (!valid(board,back.r,back.c))     continue;
-          if (board[back.r][back.c] != back.d) continue;
-          if (board[back.r][back.c] == 0)      continue;
           minking = min(minking,king_from(back.r,back.c));
           for (int i = 0; i < 8; ++i)
-            if (piece[back.r+mover[i]][back.c+movec[i]] != 1)
+            if (piece[back.r+mover[i]][back.c+movec[i]] != 1 &&
+                valid(board,back.r+mover[i],back.c+movec[i]) &&
+                board[back.r+mover[i]][back.c+movec[i]] == back.d-1 &&
+                board[back.r+mover[i]][back.c+movec[i]] != 0)
               B.push(coord(back.r+mover[i],back.c+movec[i],back.d-1));
         }
       }
     }
     for (int i = 0; i < 8; ++i)
-      Q.push(coord(cur.r+mover[i],cur.c+movec[i],cur.d+1));
+      if (valid(board,cur.r+mover[i],cur.c+movec[i]) &&
+          board[cur.r+mover[i]][cur.c+movec[i]] == infinity)
+        Q.push(coord(cur.r+mover[i],cur.c+movec[i],cur.d+1));
   }
   for (int i = 1; i < K; ++i)
     gather+=board[Krow[i]][Kcol[i]];
+
+  if (minking == infinity || gather == infinity)
+    return infinity;
   return minking + gather;
 }
 
@@ -123,9 +128,11 @@ int main(){
   }
   fin.close();
   int solution = infinity;
-  for(int i = 0; i < R
+  for(int i = 0; i < R; ++i)
+    for (int j = 0; j < C; ++j)
+      solution = min(solution,bfs_from(board,i,j));
 
-  fout << bfs_from(board,4,1) << endl;
+  fout << solution << endl;
 
   // debugprint(piece);
   // debugprint(board);
