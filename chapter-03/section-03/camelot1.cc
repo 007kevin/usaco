@@ -23,8 +23,30 @@ int movec[] = {+2,-2,+2,-2,-1,-1,+1,+1};
 int K,Krow[MROW*MCOL],Kcol[MROW*MCOL]; // King is when K=0
 int piece[MROW][MCOL];
 int board[MROW][MCOL];
+
+template <class T> class cqueue{
+  T data[MROW*MCOL];
+  int head,tail;
+public:
+  cqueue<T>(): head(0), tail(0) {}
+  void push(T item){
+    data[tail] = item;
+    tail=(tail+1)%(MROW*MCOL);
+  }
+  void pop(){
+    head=(head+1)%(MROW*MCOL);
+  }
+  T front(){
+    return data[head];
+  }
+  bool empty(){
+    return head == tail;
+  }
+};
+
 struct coord {
   unsigned char r,c,d;
+  coord(){}
   coord(int row,int col,int dist){
     r = row; c = col; d = dist;
   }
@@ -50,7 +72,7 @@ int bfs_from(int (*board)[MCOL], int r, int c){
   int knights = 0;
   int gather = 0;
   int minking = king_from(r,c);
-  queue<coord> Q;
+  cqueue<coord> Q;
   Q.push(coord(r,c,0));
   while(!Q.empty() && knights < K){
     coord cur = Q.front(); Q.pop();
@@ -64,7 +86,7 @@ int bfs_from(int (*board)[MCOL], int r, int c){
     if (piece[cur.r][cur.c] == 1){
       knights++;
       if (minking != 0){
-        queue<coord> B;
+        cqueue<coord> B;
         B.push(cur);
         while(!B.empty()){
           coord back = B.front(); B.pop();
