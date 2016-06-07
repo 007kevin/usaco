@@ -4,10 +4,14 @@ LANG: C++
 TASK: camelot
 Date: 01/06/2016
 Anaylsis:
+  We test every node on the board as a potential
+  gathering point and bfs to every knight. Whenever
+  a knight node is encoutered, we backtrack the path
+  and for each node encountered we cross-ref the king's
+  distance to the node and find the minimum.
 */
 #include <iostream>
 #include <fstream>
-#include <queue>
 #include <cstdlib>
 #include <climits>
 #include <cassert>
@@ -15,14 +19,32 @@ using namespace std;
 #define infinity INT_MAX
 #define max(a,b) (a) < (b) ? b : a
 #define min(a,b) (a) < (b) ? a : b
-#define MROW 30
-#define MCOL 26
+#define MROW 35
+#define MCOL 31
 int R,C;
 int mover[] = {-1,-1,+1,+1,+2,-2,+2,-2};
 int movec[] = {+2,-2,+2,-2,-1,-1,+1,+1};
-int K,Krow[MROW*MCOL],Kcol[MROW*MCOL]; // King is when K=0
+int K,Krow[MROW*MCOL+1],Kcol[MROW*MCOL+1]; // King is when K=0
 int piece[MROW][MCOL];
 int board[MROW][MCOL];
+
+void debugprint(int (*board)[MCOL]){
+  cout << endl;
+  cout << "\t";
+  for (int i = 0; i < C; ++i)
+    cout << (char) ('A'+i) << "\t";
+  cout << endl;
+  for (int i = 0; i < R; ++i){
+    cout << i+1 << '\t';
+    for (int j = 0 ; j < C; ++j){
+      if (board[i][j] != infinity)
+        cout << board[i][j] << "\t";
+      else
+        cout << '-' << '\t';
+    }
+    cout << endl;
+  }
+}
 
 template <typename T>
 struct node {
@@ -101,7 +123,7 @@ int bfs_from(int (*board)[MCOL], int r, int c){
   int minking = king_from(r,c);
   cqueue<coord> Q;
   Q.push(coord(r,c,0));
-  while(!Q.empty() && knights < K){
+  while(!Q.empty() && knights < K-1){
     coord cur = Q.front(); Q.pop();
     if (!valid(board,cur.r,cur.c) ||
         board[cur.r][cur.c] != infinity)
@@ -130,30 +152,11 @@ int bfs_from(int (*board)[MCOL], int r, int c){
     for (int i = 0; i < 8; ++i)
       Q.push(coord(cur.r+mover[i],cur.c+movec[i],cur.d+1));
   }
+  if (knights < K-1) // Gathering node is not possible for some knights
+    return infinity;
   for (int i = 1; i < K; ++i)
     gather+=board[Krow[i]][Kcol[i]];
-
-  if (minking == infinity || gather == infinity)
-    return infinity;
   return minking + gather;
-}
-
-void debugprint(int (*board)[MCOL]){
-  cout << endl;
-  cout << "\t";
-  for (int i = 0; i < C; ++i)
-    cout << (char) ('A'+i) << "\t";
-  cout << endl;
-  for (int i = 0; i < R; ++i){
-    cout << i+1 << '\t';
-    for (int j = 0 ; j < C; ++j){
-      if (board[i][j] != infinity)
-        cout << board[i][j] << "\t";
-      else
-        cout << '-' << '\t';
-    }
-    cout << endl;
-  }
 }
 
 int main(){
@@ -181,18 +184,6 @@ int main(){
     }
 
   fout << solution << endl;
-
-  // debugprint(piece);
-  // debugprint(board);
-
-  
-  // cqueue<int> test;
-  // for (int i = 0; i < 10; ++i)
-  //   test.push(i);
-  // for (int i = 0; i < 10; ++i){
-  //   cout << test.front() << endl;
-  //   test.pop();
-  // }
   
   fout.close();  
   return 0;
