@@ -24,29 +24,56 @@ int K,Krow[MROW*MCOL],Kcol[MROW*MCOL]; // King is when K=0
 int piece[MROW][MCOL];
 int board[MROW][MCOL];
 
-template <class T> class cqueue{
-  T data[MROW*MCOL];
-  int head,tail;
+template <typename T>
+struct node {
+  T data;
+  node<T>* next;
+  node(T d): next(NULL) {data = d;}
+};
+
+template <class T>
+class cqueue{
+  node<T>* head;
+  node<T>* tail;
+  void delete_node(node<T>* n){
+    if (n == NULL) return;
+    delete_node(n->next);
+    delete n;
+  }
 public:
-  cqueue<T>(): head(0), tail(0) {}
+  cqueue(): head(NULL), tail(NULL) {}
+  ~cqueue(){
+    delete_node(head);
+  }
   void push(T item){
-    data[tail] = item;
-    tail=(tail+1)%(MROW*MCOL);
+    node<T>* n = new node<T>(item);
+    if (head == NULL){
+      head = n;
+      tail = head;
+    }
+    else{
+      tail->next = n;
+      tail = n;
+    }
   }
   void pop(){
-    head=(head+1)%(MROW*MCOL);
+    if (empty())
+      return;
+    node<T>* n = head->next;
+    delete head;
+    head = n;
   }
   T front(){
-    return data[head];
+    return head->data;
   }
   bool empty(){
-    return head == tail;
+    return head == NULL;
   }
 };
 
 struct coord {
-  unsigned char r,c,d;
-  coord(){}
+  int r,c,d;
+  coord(){};
   coord(int row,int col,int dist){
     r = row; c = col; d = dist;
   }
@@ -157,9 +184,15 @@ int main(){
 
   // debugprint(piece);
   // debugprint(board);
+
   
-  
-  
+  // cqueue<int> test;
+  // for (int i = 0; i < 10; ++i)
+  //   test.push(i);
+  // for (int i = 0; i < 10; ++i){
+  //   cout << test.front() << endl;
+  //   test.pop();
+  // }
   
   fout.close();  
   return 0;
