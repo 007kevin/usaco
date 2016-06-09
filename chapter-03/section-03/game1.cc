@@ -12,13 +12,15 @@ Anaylsis:
 using namespace std;
 int N;
 int board[MAXN];
+int dp[2][MAXN];
 
 int solve(int p,int l, int r){
   if (l == r)
     return board[l];
-  int res = max(solve((p+1)%2,l+1,r),solve((p+1)%2,l,r-1));
-  cout << res << endl;
-                
+  int res = max(board[l] + solve((p+1)%2,l+1,r),
+                board[r] + solve((p+1)%2,l,r-1));
+
+  dp[p][r-l] = max(dp[p][r-l],res);
   return res;
 }
 
@@ -31,6 +33,9 @@ int main(){
   for (int i = 1; i <= N; ++i)
     fin>>board[i];
   solve(0,1,N);
+  for (int i = 1; i < N; ++i)
+    cout << dp[0][i] << '\t'<< dp[1][i] << endl;
+
   return 0;
 }
 
