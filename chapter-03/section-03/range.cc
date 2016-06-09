@@ -4,16 +4,21 @@ LANG: C++
 TASK: range
 Date: 07/06/2016
 Anaylsis:
-  Find the biggest unravaged field, mark it,
-  then iterate the unvisited?
+  Recursively break down into the smaller squares until
+  we reach size 1. Base of whether that square is ravaged,
+  we recursively backtrack to squares of bigger size in 
+  which the first square will determine is current square is also
+  ravaged/unravaged. We use subfield to keep track of visited
+  squares.
 */
 #include <iostream>
 #include <fstream>
+#include <vector>
 using namespace std;
 #define MAXN 251
 int N;
 int field[MAXN][MAXN];
-bool subfield[MAXN][MAXN][MAXN];
+vector<vector<vector<bool> > > subfield;
 int squares[MAXN];
 
 bool solve(int a, int b, int m){
@@ -67,6 +72,13 @@ int main(){
       fin>>c;
       field[i][j] = c-'0';
     }
+  subfield.resize(N+1);
+  for (int i = 0; i <= N; ++i){
+    subfield[i].resize(N+1);
+    for (int j = 0; j <= N; ++j)
+      subfield[i][j].resize(N+1);
+  }
+    
   solve(0,0,N);
   for (int i = 2; i <= N; ++i)
     if (squares[i])
