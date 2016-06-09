@@ -15,26 +15,27 @@ int N;
 int field[MAXN][MAXN];
 int squares[MAXN];
 
-void solve(int m){
-  if (m < 2)
-    return;
-  for (int i = 0; i+m <= N; ++i)
-    for (int j = 0; j+m <= N; ++j){
-      bool ravaged = false;
-      for (int k = i; k <= m; ++k){
-        for (int l = j; l <= m; ++l)
-          if (field[k][l] == 0){
-            ravaged = true;
-            break;
-          }
-        if (ravaged)
-          break;
-      }
-      if (!ravaged){
+bool solve(int a, int b, int m){
+  if (m < 1)
+    return field[a][b] == 1;
+
+  int subfield[N-m+1][N-m+1];
+  for (int i = 0; i < N-m+1; ++i)
+    for (int j = 0; j < N-m+1; ++j){
+      if (solve(i,j,m-1)){
+        subfield[i][j] = 1;
         squares[m]++;
       }
+      else
+        subfield[i][j] = 0;
     }
-  solve(m-1);
+  for (int i = 0; i < N-m+1; ++i){
+    for (int j = 0; j < N-m+1; ++j){
+      if (subfield[i][j] == 0)
+        return false;
+    }
+  }
+  return true;
 }
 
 
@@ -42,12 +43,14 @@ int main(){
   ifstream fin("range.in");
   ofstream fout("range.out");
   fin>>N;
+  char c;
   for (int i = 0; i < N; ++i)
-    for (int j = 0; j < N; ++j)
-      fin>>field[i][j];
-  solve(N);
+    for (int j = 0; j < N; ++j){
+      fin>>c;
+      field[i][j] = c-'0';
+    }
+  solve(0,0,N);
   for (int i = 2; i <= N; ++i)
-    fout << i << " " << squares[i] << endl;
- 
-  
+    if (squares[i])
+      fout << i << " " << squares[i] << endl;
 }
