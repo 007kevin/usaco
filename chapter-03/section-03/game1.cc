@@ -12,16 +12,21 @@ Anaylsis:
 using namespace std;
 int N;
 int board[MAXN];
-int dp[2][MAXN];
+int player[2];
 
 int solve(int p,int l, int r){
   if (l == r)
     return board[l];
-  int res = max(board[l] + solve((p+1)%2,l+1,r),
-                board[r] + solve((p+1)%2,l,r-1));
-
-  dp[p][r-l] = max(dp[p][r-l],res);
-  return res;
+  int moveL = board[l]+solve((p+1)%2,l+1,r);
+  int moveR = board[r]+solve((p+1)%2,l,r-1);
+  if (moveL > moveR){
+    player[p] = max(moveL,player[p]);
+    return moveL;
+  }
+  else {
+    player[p] = max(moveR,player[p]);
+    return moveR;
+  }
 }
 
 int main(){
@@ -32,9 +37,9 @@ int main(){
   
   for (int i = 1; i <= N; ++i)
     fin>>board[i];
-  solve(0,1,N);
-  for (int i = 1; i < N; ++i)
-    cout << dp[0][i] << '\t'<< dp[1][i] << endl;
+  cout << solve(0,1,N) << endl;
+  cout << player[0] << endl;
+  cout << player[1] << endl;
 
   return 0;
 }
