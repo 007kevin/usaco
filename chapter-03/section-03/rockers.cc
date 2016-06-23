@@ -13,6 +13,13 @@ Anaylsis:
   the N songs, therefore for the current disk, we must
   select the partition that gives us the highest value
   and continue for the next disk.
+
+  Correction: This approach is wrong. Performing 0/1 knapsack
+              per disk will fail for the following test case:
+
+                  9 15 4 
+                  15 7 8 6 9 5 10 4 11
+
 */
 #include <iostream>
 #include <fstream>
@@ -30,10 +37,12 @@ int max(int a, int b){
 }
   
 int fill_disks(int m, int s, int e){
-  if (s > e || m == M)
+  if (s > e || m >= M)
     return 0;
+  if (s == e){
+    return songs[s] <= T ? 1 : 0;
+  }
   int dp[e-s+2][T+1];
-  int L,R;
   for (int i = 0; i <= T; ++i) dp[0][i] = 0;
   for (int i = 0; i <= e-s+1; ++i) dp[i][0] = 0;
   
@@ -41,46 +50,31 @@ int fill_disks(int m, int s, int e){
     for (int j = 1; j <= T; ++j){
       if (songs[i+s-1] > j)
         dp[i][j] = dp[i-1][j];
-      else{
-        if (dp[i-1][j] <= dp[i-1][j-songs[i+s-1]] + 1){
-          dp[i][j] = dp[i-1][j-songs[i+s-1]] + 1;
-          R = i+s-1;
-        }
-        else
-          dp[i][j] = dp[i-1][j];
-      }
+      else
+        dp[i][j] = max(dp[i-1][j],dp[i-1][j-songs[i+s-1]] + 1);
     }
   // backtrack to find included items
   int i = e-s+1;
-  L = i;
   int j = T;
+  int items[e-s+2], idx = 0;
   while (i > 0){
     if (dp[i][j] == 0) break;
     if (dp[i][j] == dp[i-1][j])
       i--;
     else{
-      L = i+s-1;
+      items[idx++] = i+s-1;
       j -= songs[i+s-1];
       i--;
     }
   }
-  // Reduce potential gap between included songs
-  int item = songs[L];
-  printf("%d\n",L);
-  int r = R-dp[e-s+1][T]+1;
-  while (songs[r] != item) r--;
-  L = r;
-
-
-  for (int i =0 ; i <= e-s+1; ++i){
-    for (int j = 0; j <= T; ++j)
-      printf("%d ", dp[i][j]);
-    printf("\n");
+  int L = items[0];
+  int R = items[0];
+  // Find the smallest range of songs that make up the disk
+  for (int I = 0; I < idx; ++I){
+    while (songs[items[I]] != songs[L]) L--;
   }
-  printf("m:%d - %d %d (%d) item:%d\n", m, L,R, dp[e-s+1][T],item);
-  return 0;
-  
-  return dp[e-s+1][T] + max(fill_disks(m+1,s,L-1),fill_disks(m+1,R+1,e));
+  printf("items: %d from %d to %d\n",dp[e-s+1][T],L,R);
+  return dp[e-s+1][T] + fill_disks(m+1,s,L-1) + fill_disks(m+2,R+1,e);
 }
 
 int main(){
@@ -91,12 +85,12 @@ int main(){
   fin>>N>>T>>M;
   for (int i = 0; i < N; ++i)
     fin>>songs[i];
-  for (int i = 0; i < N; ++i)
-    printf("%d\t", songs[i]);
-  printf("\n");
-  for (int i = 0; i < N; ++i)
-    printf("%d\t", i);
-  printf("\n");  
+  // for (int i = 0; i < N; ++i)
+  //   printf("%d\t", songs[i]);
+  // printf("\n");
+  // for (int i = 0; i < N; ++i)
+  //   printf("%d\t", i);
+  // printf("\n");  
   
   fout << fill_disks(0,0,N-1) << endl;
   return 0;
