@@ -23,12 +23,16 @@ int N,T,M;
 int songs[MAXN];
 int value[MAXN];
 int I = 0;
+int max_songs = 0;
 
 int max(int a, int b){
   return a < b ? b : a;
 }
 
 void evaluate(int l, int r){
+  if (l > r) return;
+  
+  // Get value of song range
   int dp[r-l+2][T+1];
   for (int i = 0; i <= T; ++i)   dp[0][i] = 0;
   for (int i = 0; i <= r-l+1; ++i) dp[i][0] = 0;
@@ -38,17 +42,24 @@ void evaluate(int l, int r){
         dp[i][j] = dp[i-1][j];
       else
         dp[i][j] = max(dp[i-1][j],dp[i-1][j-songs[i+l-1]]+1);
-  for (int i = 0; i <= r-l+1; ++i){
-    for (int j = 0; j <= T; ++j)
-      cout << dp[i][j] << " ";
-    cout << endl;
-  }
-        
-  cout << "result" << endl;
-  cout << dp[r-l+1][T] << endl;
-  
 }
+
+void getsets(int l, int r){
+  if (l > r) return;
+  getsets(0,l-1);
+  for (int i = 0; i < N; ++i)
+    if (l <= i && i <= r)
+      cout << songs[i] << " ";
+    else
+      cout << "_ ";
+  cout << endl;
+  getsets(l+1,r);
   
+
+
+}
+
+
 
 int main(){
   ifstream fin("rockers.in");
@@ -59,8 +70,9 @@ int main(){
   for (int i = 0; i < N; ++i)
     fin>>songs[i];
   fin.close();
-  cout << N << " " << T << " " << M << endl;
+
   evaluate(0,N-1);
+  getsets(0,N-1);
 
   fout.close();
   return 0;
