@@ -79,13 +79,10 @@ int main(){
   int l = x;
   int r = x;
   for (int y = start; y > 0; --y){
-    cout << l << " " << r << endl;
-    
-    while (inTriangle(a,b,c,point(r,y,0))) r++;
-    while (!inTriangle(a,b,c,point(r,y,0))) r--;
-    l = r;
-    while (inTriangle(a,b,c,point(l,y,0))) l--;
-    while (!inTriangle(a,b,c,point(l,y,0))) l++;
+    while (r <= l && inTriangle(a,b,c,point(r,y,0))) r++;
+    while (r <= l && !inTriangle(a,b,c,point(r,y,0))) r--;
+    while (r <= l && inTriangle(a,b,c,point(l,y,0))) l--;
+    while (r <= l && !inTriangle(a,b,c,point(l,y,0))) l++;
     cows += (r-l+1);
   }
   fout << cows << endl;
