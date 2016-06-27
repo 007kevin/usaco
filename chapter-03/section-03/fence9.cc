@@ -4,11 +4,6 @@ LANG: C++
 TASK: fence9
 Date: 26/06/2016
 Anaylsis:
-  Max N and M is 32000, therefore brute-force will
-  take too long O(N*M). This solution fails, but 
-  I learned how to determine whether a point is in 
-  a triangle
-
   Note: 
   - By making use of a reference point we know 
     to be in the triangle, we take the cross products
@@ -20,20 +15,16 @@ Anaylsis:
 #include <fstream>
 #include <cassert>
 #define max(a,b) ((a) > (b) ? a : b)
-#define min(a,b) ((a) < (b) ? a : b)
 using namespace std;
 double N,M,P;
-int cows;
+long long cows;
 struct point {
   double x,y,z;
-  point(double x1, double y1, double z1): x(0), y(0), z(0) {
+  point(double x1, double y1, double z1){
     x = x1, y = y1, z = z1;
   }
   point operator-(point r){
     return point(x-r.x,y-r.y,z-r.z);
-  }
-  point operator*(int s){
-    return point(x*s,y*s,z*s);
   }
 };
 point crossproduct(point p1, point p2){
@@ -71,5 +62,33 @@ int main(){
   point a = point(0,0,0);
   point b = point(N,M,0);
   point c = point(P,0,0);
+  
+  // We start from the height where there is at least
+  // 1 valid lattice to keep r > l in the while loops
+  int x,start;
+  for (start = M; start >= 0; --start){
+    bool flag = false;
+    for (x = 0; x <= max(N,P); ++x)
+      if (inTriangle(a,b,c,point(x,start,0))){
+        flag = true;
+        break;
+      }
+    if (flag) break;
+  }
+  cout << x << " " << start << endl;
+  int l = x;
+  int r = x;
+  for (int y = start; y > 0; --y){
+    cout << l << " " << r << endl;
+    
+    while (inTriangle(a,b,c,point(r,y,0))) r++;
+    while (!inTriangle(a,b,c,point(r,y,0))) r--;
+    l = r;
+    while (inTriangle(a,b,c,point(l,y,0))) l--;
+    while (!inTriangle(a,b,c,point(l,y,0))) l++;
+    cows += (r-l+1);
+  }
+  fout << cows << endl;
+  fout.close();
   return 0;
 }
