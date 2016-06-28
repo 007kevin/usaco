@@ -73,6 +73,16 @@ bool leftOfTri(point a, point b, point c, point p){
   return false;
 }
 
+bool leftOfRightMostTri(point a, point b, point c, point p){
+  point ref = point((a.x+b.x+c.x)/3,
+                    (a.y+b.y+c.y)/3,
+                    0);
+  point bcrc = crossproduct(b-c,ref-c);
+  point bcpc = crossproduct(b-c,p-c);
+  if (bcpc.z == 0) return false;
+  return bcrc.z < 0 == bcpc.z < 0;
+}
+
 bool rightOfTri(point a, point b, point c, point p){
   point ref = point((a.x+b.x+c.x)/3,
                     (a.y+b.y+c.y)/3,
@@ -93,6 +103,16 @@ bool rightOfTri(point a, point b, point c, point p){
   return false;
 }
 
+bool rightOfLeftMostTri(point a, point b, point c, point p){
+  point ref = point((a.x+b.x+c.x)/3,
+                    (a.y+b.y+c.y)/3,
+                    0);
+  point bara = crossproduct(b-a,ref-a);
+  point bapa = crossproduct(b-a,p-a);
+  if (bapa.z == 0) return false;
+  return bara.z < 0 == bapa.z < 0;
+}
+
 int main(){
   ifstream fin("fence9.in");
   ofstream fout("fence9.out");
@@ -103,29 +123,15 @@ int main(){
   point b = point(N,M,0);
   point c = point(P,0,0);
   int l = 0;
-  int r = P-1;
+  int r = P;
   for (int y = 1; y < M; ++y){
-    if (M < P){
-    while (l < r && !inTriangle(a,b,c,point(r,y,0))) r--;
-    while (l < r && !inTriangle(a,b,c,point(l,y,0))) l++;
-    cows += r-l+1;
-    }
-    if (M > P){
-    while (l < r && inTriangle(a,b,c,point(r,y,0))) r--;
-    while (l < r && !inTriangle(a,b,c,point(l,y,0))) l++;
-    cows += r-l;
-    if (l == r && inTriangle(a,b,c,point(r,y,0)))
-      cows++;
-    cout << l << " " << r << endl;
-    }
-    if (M == P){
-      while (l < r && !inTriangle(a,b,c,point(r,y,0))) r--;
-      r++;
-      while (l < r && !inTriangle(a,b,c,point(l,y,0))) l++;
-      cows += r-l;
-      if (l == r && inTriangle(a,b,c,point(r,y,0)))
-        cows++;
-    }
+    while (rightOfTri(a,b,c,point(r,y,0))) r--;
+    while (leftOfRightMostTri(a,b,c,point(r,y,0))) r++;
+
+    while (leftOfTri(a,b,c,point(l,y,0))) l++;
+    while (rightOfLeftMostTri(a,b,c,point(l,y,0))) l--;
+    
+    cows += r-l-1;
   }
 
   fout << cows << endl;
