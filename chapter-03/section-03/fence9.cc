@@ -53,6 +53,46 @@ bool inTriangle(point a, point b, point c, point p){
   return false;
 }
 
+bool leftOfTri(point a, point b, point c, point p){
+  point ref = point((a.x+b.x+c.x)/3,
+                    (a.y+b.y+c.y)/3,
+                    0);
+  point bara = crossproduct(b-a,ref-a);
+  point cara = crossproduct(c-a,ref-a);
+  point bcrc = crossproduct(b-c,ref-c);
+  point bapa = crossproduct(b-a,p-a);
+  point capa = crossproduct(c-a,p-a);
+  point bcpc = crossproduct(b-c,p-c);
+  // if z == 0, then point is along wire fence
+  if (bapa.z == 0 || capa.z == 0 || bcpc.z == 0)
+    return false;
+  if (bara.z < 0 != bapa.z < 0 &&
+      cara.z < 0 == capa.z < 0 &&
+      bcrc.z < 0 == bcpc.z < 0)
+    return true;
+  return false;
+}
+
+bool rightOfTri(point a, point b, point c, point p){
+  point ref = point((a.x+b.x+c.x)/3,
+                    (a.y+b.y+c.y)/3,
+                    0);
+  point bara = crossproduct(b-a,ref-a);
+  point cara = crossproduct(c-a,ref-a);
+  point bcrc = crossproduct(b-c,ref-c);
+  point bapa = crossproduct(b-a,p-a);
+  point capa = crossproduct(c-a,p-a);
+  point bcpc = crossproduct(b-c,p-c);
+  // if z == 0, then point is along wire fence
+  if (bapa.z == 0 || capa.z == 0 || bcpc.z == 0)
+    return false;
+  if (bara.z < 0 == bapa.z < 0 &&
+      cara.z < 0 == capa.z < 0 &&
+      bcrc.z < 0 != bcpc.z < 0)
+    return true;
+  return false;
+}
+
 int main(){
   ifstream fin("fence9.in");
   ofstream fout("fence9.out");
@@ -71,7 +111,7 @@ int main(){
     cows += r-l+1;
     }
     if (M > P){
-    while (l < r && inTriangle(a,b,c,point(r,y,0))) r++;
+    while (l < r && inTriangle(a,b,c,point(r,y,0))) r--;
     while (l < r && !inTriangle(a,b,c,point(l,y,0))) l++;
     cows += r-l;
     if (l == r && inTriangle(a,b,c,point(r,y,0)))
@@ -87,6 +127,7 @@ int main(){
         cows++;
     }
   }
+
   fout << cows << endl;
   fout.close();
   return 0;
