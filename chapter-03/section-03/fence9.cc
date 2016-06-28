@@ -62,28 +62,30 @@ int main(){
   point a = point(0,0,0);
   point b = point(N,M,0);
   point c = point(P,0,0);
-  
-  // We start from the height where there is at least
-  // 1 valid lattice to keep r > l in the while loops
-  int x,start;
-  for (start = M; start >= 0; --start){
-    bool flag = false;
-    for (x = 0; x <= max(N,P); ++x)
-      if (inTriangle(a,b,c,point(x,start,0))){
-        flag = true;
-        break;
-      }
-    if (flag) break;
-  }
-  cout << x << " " << start << endl;
-  int l = x;
-  int r = x;
-  for (int y = start; y > 0; --y){
-    while (r <= l && inTriangle(a,b,c,point(r,y,0))) r++;
-    while (r <= l && !inTriangle(a,b,c,point(r,y,0))) r--;
-    while (r <= l && inTriangle(a,b,c,point(l,y,0))) l--;
-    while (r <= l && !inTriangle(a,b,c,point(l,y,0))) l++;
-    cows += (r-l+1);
+  int l = 0;
+  int r = P-1;
+  for (int y = 1; y < M; ++y){
+    if (M < P){
+    while (l < r && !inTriangle(a,b,c,point(r,y,0))) r--;
+    while (l < r && !inTriangle(a,b,c,point(l,y,0))) l++;
+    cows += r-l+1;
+    }
+    if (M > P){
+    while (l < r && inTriangle(a,b,c,point(r,y,0))) r++;
+    while (l < r && !inTriangle(a,b,c,point(l,y,0))) l++;
+    cows += r-l;
+    if (l == r && inTriangle(a,b,c,point(r,y,0)))
+      cows++;
+    cout << l << " " << r << endl;
+    }
+    if (M == P){
+      while (l < r && !inTriangle(a,b,c,point(r,y,0))) r--;
+      r++;
+      while (l < r && !inTriangle(a,b,c,point(l,y,0))) l++;
+      cows += r-l;
+      if (l == r && inTriangle(a,b,c,point(r,y,0)))
+        cows++;
+    }
   }
   fout << cows << endl;
   fout.close();
