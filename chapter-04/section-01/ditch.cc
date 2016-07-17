@@ -4,7 +4,19 @@ LANG: C++
 TASK: ditch
 Date: 15/07/2016
 Anaylsis:
-  This involves use of Network Flow Algorithms
+  This involves use of Network Flow Algorithms.
+  Note: 
+    - Each iteration of graph, we must find max flow path
+    - After each iteration, we must add the reverse arc of
+      the minimum arc along the path
+
+  https://en.wikipedia.org/wiki/Ford-Fulkerson_algorithm
+  It is good to note for finding the augmenting paths in 
+  the residual network is not specified, therefore we could
+  have also used BFS to find paths from sink to source. Because
+  of USACO's mention of the algorithm finding the path
+  with max cap, attempts to solve this problem may have been
+  harder than it could have been.
 */
 #include <iostream>
 #include <fstream>
@@ -40,7 +52,7 @@ int main(){
   int s,e,c;
   for (int i = 0; i < N; ++i){
     fin>>s>>e>>c;
-    matrix[s][e] = c;
+    matrix[s][e]+=c;
   }
   fin.close();
   while (true){
@@ -82,6 +94,7 @@ int main(){
     int cur = M;
     while (parent[cur] != 0){
       matrix[parent[cur]][cur]-=mc;
+      matrix[cur][parent[cur]]+=mc; // Add reverse arc
       cur = parent[cur];
     }
     C+=mc;
