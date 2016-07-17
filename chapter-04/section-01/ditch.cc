@@ -6,6 +6,8 @@ Date: 15/07/2016
 Anaylsis:
   This involves use of Network Flow Algorithms.
   Note: 
+    - There can be more than one ditch between two intersections therefore
+      just add to the adjaceny matrix.
     - Each iteration of graph, we must find max flow path
     - After each iteration, we must add the reverse arc of
       the minimum arc along the path
