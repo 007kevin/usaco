@@ -8,7 +8,7 @@ Anaylsis:
 #include <iostream>
 #include <fstream>
 #include <cassert>
-#define MAX 202
+#define MAX 402
 using namespace std;
 int N,M,sol;
 int matrix[MAX][MAX];
@@ -18,8 +18,10 @@ int augment_path(int n){
     return 1;
   }
   for (int i = 1; i <= N+M+1; ++i)
-    if (matrix[n][i] && augment_path(i))
+    if (matrix[n][i] && augment_path(i)){
       matrix[n][i] = 0;
+      return 1;
+    }
   return 0;
 }
 int main(){
