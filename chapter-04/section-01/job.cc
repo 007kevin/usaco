@@ -168,13 +168,13 @@ int main(){
   fin>>N>>M1>>M2;
   for (int i = 1; i <= M1+M2; ++i) fin>>P[i];
   fin.close();
+  // compute # of seconds to output onto intermediate container
+  // from machine A
+  int output;
   int t = 1;
-  int output = nfa_A(3);
-  int x;
-  while((x = nfa_B(t)) < output)
+  while ((output = nfa_A(t)) == 0)
     t++;
-  cout << t << " seconds to process " << x << " items" << endl;
-
+  
   fout.close();
   return 0;
 }
