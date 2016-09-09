@@ -54,7 +54,6 @@ bool splitting_point(int s, int p){
   return true;
 }
 
-
 int main(){
   ifstream fin("race3.in");
   ofstream fout("race3.out");
@@ -85,13 +84,27 @@ int main(){
   //   cout << endl;
   // }
   
-  fout << UP.size() << " ";
-  for (int i = 0; i < UP.size(); ++i)
-    fout << UP[i] << " ";
+  fout << UP.size();
+  if (UP.size() != 0){
+    fout << " ";
+    for (int i = 0; i < UP.size(); ++i){
+      fout << UP[i];
+      if (i < UP.size()-1)
+        fout << " ";
+    }
+  }    
   fout << endl;
-  fout << SP.size() << " ";
-  for (int i = 0; i < SP.size(); ++i)
-    fout << SP[i] << " ";
+
+  fout << SP.size();
+  if (SP.size() != 0){
+    fout << " ";
+    for (int i = 0; i < SP.size(); ++i){
+      fout << SP[i];
+      if (i < SP.size()-1)
+        fout << " ";
+    }
+  }
   fout << endl;
+  
   return 0;
 }
